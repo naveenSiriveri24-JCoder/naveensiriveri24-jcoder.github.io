@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Bill Tracker</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+
+        <h1>💰 Monthly Bill Tracker</h1>
+        <div class="category-section">
+
+        <input
+            type="text"
+            id="categoryInput"
+            placeholder="New Category">
+
+        <button onclick="addCategory()">
+            Add Category
+        </button>
+
+        <select id="categoryDelete"></select>
+
+        <button onclick="deleteCategory()">
+            Delete Category
+        </button>
+
+    </div>
+
+    </div>
+        <div class="expense-form">
+
+            <input type="text"
+                   id="title"
+                   placeholder="Expense Name">
+
+            <input type="number"
+                   id="amount"
+                   placeholder="Amount">
+
+            <select id="category">
+                <option value="">
+                    Select Category
+                </option>
+            </select>
+
+            <input type="date" id="date">
+            <input type="file" id="billPhoto" accept="image/*">
+            <button onclick="addExpense()">
+                Add Expense
+            </button>
+
+        </div>
+
+        <div class="summary">
+
+            <h2>
+                Total Expenses :
+                ₹ <span id="totalAmount">0</span>
+            </h2>
+
+        </div>
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Search Expense..."
+            onkeyup="renderExpenses()">
+        <input
+            type="month"
+            id="monthFilter"
+            onchange="renderExpenses()">
+
+            <div class="dashboard">
+
+    <div id="dashboard" class="dashboard"></div>
+
+    <div class="chart-container">
+        <canvas id="expenseChart"></canvas>
+    </div>
+
+    </div>
+        <table>
+
+            <thead>
+                <tr>
+                    
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Image</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="expenseTable">
+            </tbody>
+
+        </table>
+
+    </div>
+    <button onclick="exportCSV()">
+    Export CSV
+</button>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+
+</body>
+</html>
