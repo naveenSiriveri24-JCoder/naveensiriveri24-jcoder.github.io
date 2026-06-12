@@ -2,104 +2,238 @@
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial, sans-serif;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body{
-    background:#f5f7fa;
-    padding:30px;
+    background:#f4f7fc;
+    min-height:100vh;
+    padding:20px;
 }
 
 .container{
-    max-width:1100px;
+    max-width:1400px;
     margin:auto;
 }
 
+/* HEADER */
+
 h1{
     text-align:center;
-    margin-bottom:30px;
+    margin-bottom:25px;
+    color:#333;
+    font-size:32px;
 }
 
-.expense-form{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+/* CATEGORY SECTION */
+
+.category-section{
+    display:flex;
     gap:10px;
     margin-bottom:20px;
 }
 
-input,
-select,
-button{
-    padding:12px;
-    border:1px solid #ccc;
-    border-radius:6px;
+.category-section input{
+    flex:1;
 }
 
-button{
-    background:#4CAF50;
-    color:white;
-    border:none;
-    cursor:pointer;
-}
+/* FORM */
 
-button:hover{
-    background:#45a049;
-}
+.expense-form{
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
 
-.summary{
+    display:grid;
+    grid-template-columns:
+        repeat(auto-fit,minmax(180px,1fr));
+
+    gap:12px;
+
     margin-bottom:20px;
 }
 
-table{
-    width:100%;
-    background:white;
-    border-collapse:collapse;
-}
-
-th,
-td{
+input,
+select{
     padding:12px;
     border:1px solid #ddd;
-    text-align:center;
+    border-radius:8px;
+    outline:none;
 }
 
-th{
+input:focus,
+select:focus{
+    border-color:#4CAF50;
+}
+
+/* BUTTONS */
+
+button{
+    padding:12px 16px;
+    border:none;
+    border-radius:8px;
     background:#4CAF50;
     color:white;
+    cursor:pointer;
+    transition:.3s;
+    font-weight:600;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    background:#43a047;
 }
 
 .delete-btn{
-    background:red;
+    background:#e53935;
 }
+
+.delete-btn:hover{
+    background:#c62828;
+}
+
+/* SUMMARY */
+
+.summary{
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:20px;
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+.summary h2{
+    color:#333;
+}
+
+/* SEARCH */
+
+#searchInput,
+#monthFilter{
+    margin-bottom:15px;
+}
+
+/* DASHBOARD */
 
 .dashboard{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    grid-template-columns:
+        repeat(auto-fit,minmax(220px,1fr));
+
     gap:15px;
-    margin:20px 0;
+
+    margin:25px 0;
 }
 
 .card{
     background:white;
     padding:20px;
-    border-radius:10px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+    border-radius:15px;
     text-align:center;
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
 }
 
 .card h3{
     margin-bottom:10px;
+    color:#666;
 }
 
 .card p{
-    font-size:24px;
+    font-size:26px;
     font-weight:bold;
+    color:#4CAF50;
 }
+
+/* CHART */
 
 .chart-container{
     background:white;
-    margin-top:20px;
     padding:20px;
-    border-radius:10px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+    border-radius:15px;
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+    margin-top:20px;
+}
+
+/* TABLE */
+
+.table-container{
+    overflow-x:auto;
+    margin-top:20px;
+}
+
+table{
+    width:100%;
+    min-width:900px;
+    border-collapse:collapse;
+    background:white;
+    border-radius:15px;
+    overflow:hidden;
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+th{
+    background:#4CAF50;
+    color:white;
+    padding:14px;
+}
+
+td{
+    padding:12px;
+    border-bottom:1px solid #eee;
+}
+
+tr:hover{
+    background:#f7f7f7;
+}
+
+/* EXPORT BUTTON */
+
+.export-btn{
+    margin-top:20px;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    body{
+        padding:10px;
+    }
+
+    h1{
+        font-size:24px;
+    }
+
+    .category-section{
+        flex-direction:column;
+    }
+
+    .expense-form{
+        grid-template-columns:1fr;
+    }
+
+    .dashboard{
+        grid-template-columns:1fr;
+    }
+
+    .card{
+        padding:15px;
+    }
+
+    .card p{
+        font-size:22px;
+    }
+
+    .chart-container{
+        padding:10px;
+    }
+
+    button{
+        width:100%;
+    }
+
+    table{
+        min-width:700px;
+    }
 }

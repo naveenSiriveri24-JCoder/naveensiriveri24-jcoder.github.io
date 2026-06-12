@@ -11,27 +11,11 @@ let categories = [
 ];
 
 function saveCategories(){
+
     localStorage.setItem(
         "categories",
         JSON.stringify(categories)
     );
-
-    const storedExpenses =
-    localStorage.getItem("expenses");
-
-    if(storedExpenses){
-    expenses = JSON.parse(storedExpenses);
-    }
-
-    const storedCategories =
-        localStorage.getItem("categories");
-
-    if(storedCategories){
-        categories = JSON.parse(storedCategories);
-    }
-
-    renderCategories();
-    renderExpenses();
 }
 
 async function addExpense() {
@@ -79,8 +63,10 @@ async function addExpense() {
     expense.category = category;
     expense.date = date;
 
-    saveExpenses();
+    await updateExpenseInSheet(expense);
+
     renderExpenses();
+
     clearForm();
 
     editId = null;
@@ -97,9 +83,9 @@ async function addExpense() {
         image: imageData
     };
 
-    expenses.push(expense);
+  await  saveExpenseToSheet(expense);
 
-    saveExpenses();
+    expenses.push(expense);
 
     renderExpenses();
 
@@ -217,7 +203,7 @@ function renderExpenses() {
     renderChart(categoryTotals);
 }
 
-function deleteExpense(id){
+async function deleteExpense(id){
 
     const confirmDelete =
         confirm(
@@ -228,10 +214,12 @@ function deleteExpense(id){
         return;
     }
 
+    await deleteExpenseFromSheet(id);
+
     expenses =
         expenses.filter(
-            expense => expense.id !== id
-        );
+        expense => expense.id !== id
+    );
 
     saveExpenses();
 
@@ -309,7 +297,7 @@ function editExpense(id){
         expense.category;
 
     document.getElementById("date").value =
-        expense.date;
+        expense.date.split("T")[0];
 
     editId = id;
 }
@@ -485,4 +473,16 @@ function deleteCategory(){
     saveCategories();
 
     renderCategories();
+    
 }
+
+const storedCategories =
+    localStorage.getItem("categories");
+
+if(storedCategories){
+    categories = JSON.parse(storedCategories);
+}
+
+renderCategories();
+
+loadExpensesFromSheet();
