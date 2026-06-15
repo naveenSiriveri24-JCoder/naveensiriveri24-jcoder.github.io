@@ -6,110 +6,193 @@
     <title>Monthly Bill Tracker</title>
 
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
-    <div class="container">
+<body>
 
-        <h1>💰 Monthly Bill Tracker</h1>
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="logo">
+            💰 Monthly Bill Tracker
+            <span>
+                Smart Expense Dashboard
+            </span>
+        </div>
+
+        <div class="theme-toggle">
+
+            <span class="theme-label">
+                Theme
+            </span>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    id="themeSwitch"
+                    onchange="toggleTheme()">
+
+                <span class="slider"></span>
+
+            </label>
+
+        </div>
+
+    </div>
+
+    <!-- CATEGORY MANAGEMENT -->
+
+    <div class="category-card">
+
+        <h3>
+            📂 Category Management
+        </h3>
+
         <div class="category-section">
 
-        <input
-            type="text"
-            id="categoryInput"
-            placeholder="New Category">
+            <input
+                type="text"
+                id="categoryInput"
+                placeholder="Add New Category">
 
-        <button onclick="addCategory()">
-            Add Category
-        </button>
+            <button onclick="addCategory()">
+                ➕ Add
+            </button>
 
-        <select id="categoryDelete"></select>
+            <select id="categoryDelete"></select>
 
-        <button onclick="deleteCategory()">
-            Delete Category
-        </button>
-
-    </div>
-
-    </div>
-        <div class="expense-form">
-
-            <input type="text"
-                   id="title"
-                   placeholder="Expense Name">
-
-            <input type="number"
-                   id="amount"
-                   placeholder="Amount">
-
-            <select id="category">
-                <option value="">
-                    Select Category
-                </option>
-            </select>
-
-            <input type="date" id="date">
-            <input type="file" id="billPhoto" accept="image/*">
-            <button onclick="addExpense()">
-                Add Expense
+            <button onclick="deleteCategory()">
+                🗑 Delete
             </button>
 
         </div>
 
-        <div class="summary">
+    </div>
 
-            <h2>
-                Total Expenses :
-                ₹ <span id="totalAmount">0</span>
-            </h2>
+    <!-- EXPENSE FORM -->
 
-        </div>
+    <div class="expense-form">
+
+        <input
+            type="text"
+            id="title"
+            placeholder="Expense Name">
+
+        <input
+            type="number"
+            id="amount"
+            placeholder="Amount">
+
+        <select id="category">
+
+            <option value="">
+                Select Category
+            </option>
+
+        </select>
+
+        <input
+            type="date"
+            id="date">
+
+        <input
+            type="file"
+            id="billPhoto"
+            accept="image/*">
+
+        <button onclick="addExpense()">
+            ➕ Add Expense
+        </button>
+
+    </div>
+
+    <!-- FILTERS -->
+
+    <div class="filter-section">
 
         <input
             type="text"
             id="searchInput"
-            placeholder="Search Expense..."
+            placeholder="🔍 Search Expense..."
             onkeyup="renderExpenses()">
+
         <input
             type="month"
             id="monthFilter"
             onchange="renderExpenses()">
 
-            <div class="dashboard">
-
-    <div id="dashboard" class="dashboard"></div>
-
-    <div class="chart-container">
-        <canvas id="expenseChart"></canvas>
     </div>
 
+    <!-- DASHBOARD + CHART -->
+
+    <div class="dashboard-section">
+
+        <div id="dashboard"></div>
+
+        <div class="chart-container">
+
+            <canvas id="expenseChart"></canvas>
+
+        </div>
+
     </div>
+
+    <!-- EXPORT BUTTONS -->
+
+    <div class="export-section">
+
+        <button onclick="exportCSV()">
+            📊 Export CSV
+        </button>
+
+        <button onclick="exportPDF()">
+            📄 Export PDF
+        </button>
+
+    </div>
+
+    <!-- TABLE -->
+
+    <div class="table-container">
+
         <table>
 
             <thead>
+
                 <tr>
-                    
+
                     <th>Name</th>
                     <th>Amount</th>
                     <th>Category</th>
                     <th>Date</th>
                     <th>Image</th>
                     <th>Action</th>
+
                 </tr>
+
             </thead>
 
-            <tbody id="expenseTable">
-            </tbody>
+            <tbody id="expenseTable"></tbody>
 
         </table>
 
     </div>
-    <button onclick="exportCSV()">
-    Export CSV
-</button>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="api.js"></script>
-    <script src="app.js"></script>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="api.js"></script>
+
+<script src="app.js"></script>
 
 </body>
 </html>

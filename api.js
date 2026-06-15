@@ -1,5 +1,5 @@
 const API_URL =
-    "https://script.google.com/macros/s/AKfycbwdzL_n2092MBD736JtuIYcINKsHcsyus4k60TsUf30W5KP_p9WKQQ3g6mrRR2FVjs/exec";
+    "https://script.google.com/macros/s/AKfycbx00S2VqAy6yBe1eybyQfHkbDh0VxlsW8wH3hTaNhLld88f6xZhjCeaqBLqgut86AVE/exec";
 
 async function loadExpensesFromSheet(){
 
@@ -29,23 +29,13 @@ async function saveExpenseToSheet(expense){
     try{
 
         await fetch(API_URL, {
-
             method: "POST",
-
             body: JSON.stringify(expense)
-
         });
-
-        console.log(
-            "Expense sent to Google Sheet"
-        );
 
     }catch(error){
 
-        console.error(
-            "POST Error:",
-            error
-        );
+        console.error(error);
     }
 }
 

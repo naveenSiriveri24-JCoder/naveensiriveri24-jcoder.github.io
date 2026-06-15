@@ -51,29 +51,33 @@ async function addExpense() {
         imageData = await getBase64(file);
     }
 
+    // EDIT MODE
     if(editId){
 
-    const expense =
-        expenses.find(
-            expense => expense.id === editId
-        );
+        const expense =
+            expenses.find(
+                expense => expense.id === editId
+            );
 
-    expense.title = title;
-    expense.amount = Number(amount);
-    expense.category = category;
-    expense.date = date;
+        expense.title = title;
+        expense.amount = Number(amount);
+        expense.category = category;
+        expense.date = date;
 
-    await updateExpenseInSheet(expense);
+        await updateExpenseInSheet(expense);
 
-    renderExpenses();
+        saveExpenses();
 
-    clearForm();
+        renderExpenses();
 
-    editId = null;
+        clearForm();
 
-    return;
-}
+        editId = null;
 
+        return;
+    }
+
+    // ADD NEW
     const expense = {
         id: Date.now(),
         title,
@@ -83,9 +87,11 @@ async function addExpense() {
         image: imageData
     };
 
-  await  saveExpenseToSheet(expense);
+    await saveExpenseToSheet(expense);
 
     expenses.push(expense);
+
+    saveExpenses();
 
     renderExpenses();
 
@@ -113,29 +119,33 @@ function renderExpenses() {
     dashboard.innerHTML = "";
 
     let total = 0;
-
+    let billCount = 0;
     const categoryTotals = {};
 
-    expenses.forEach(expense => {
+    const filteredExpenses = expenses.filter(expense => {
 
-        if (
-            searchText &&
-            !expense.title
-                .toLowerCase()
-                .includes(searchText)
-        ) {
-            return;
-        }
+    if(
+        searchText &&
+        !expense.title.toLowerCase().includes(searchText)
+    ){
+        return false;
+    }
 
-        if (
-            selectedMonth &&
-            !expense.date
-                .startsWith(selectedMonth)
-        ) {
-            return;
-        }
+    if(
+        selectedMonth &&
+        !expense.date.startsWith(selectedMonth)
+    ){
+        return false;
+    }
+
+    return true;
+    });
+
+    filteredExpenses.forEach(expense => {
+
 
         total += expense.amount;
+        billCount++;
 
         if(categoryTotals[expense.category]){
             categoryTotals[expense.category] += expense.amount;
@@ -176,11 +186,11 @@ function renderExpenses() {
     });
 
     dashboard.innerHTML += `
-    <div class="card">
-        <h3>Total Bills</h3>
-        <p>${expenses.length}</p>
-    </div>
-    `;
+        <div class="card">
+            <h3>Total Bills</h3>
+            <p>${filteredExpenses.length}</p>
+        </div>
+        `;
     dashboard.innerHTML += `
         <div class="card">
             <h3>Total Expenses</h3>
@@ -198,9 +208,15 @@ function renderExpenses() {
         `;
     }
 
-    document.getElementById("totalAmount").innerText =
-        total;
+    const totalAmountElement =
+    document.getElementById("totalAmount");
+
+    if(totalAmountElement){
+        totalAmountElement.innerText = total;
+    }
     renderChart(categoryTotals);
+
+    
 }
 
 async function deleteExpense(id){
@@ -267,14 +283,10 @@ function getBase64(file) {
 
 function viewImage(image){
 
-    const win =
-        window.open("");
-
-    win.document.write(`
-        <img
-            src="${image}"
-            style="max-width:100%">
-    `);
+    window.open(
+        image,
+        "_blank"
+    );
 }
 
 function editExpense(id){
@@ -486,3 +498,229 @@ if(storedCategories){
 renderCategories();
 
 loadExpensesFromSheet();
+
+
+
+function toggleTheme(){
+
+    document.body.classList.toggle(
+        "dark-mode"
+    );
+
+    const isDark =
+        document.body.classList.contains(
+            "dark-mode"
+        );
+
+    localStorage.setItem(
+        "theme",
+        isDark ? "dark" : "light"
+    );
+}
+
+const savedTheme =
+    localStorage.getItem("theme");
+
+if(savedTheme === "dark"){
+
+    document.body.classList.add(
+        "dark-mode"
+    );
+
+    document.getElementById(
+        "themeSwitch"
+    ).checked = true;
+}
+
+function exportPDF(){
+
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF();
+
+    const selectedMonth =
+        document.getElementById(
+            "monthFilter"
+        ).value;
+
+    const filteredExpenses =
+        expenses.filter(expense => {
+
+            if(
+                selectedMonth &&
+                !expense.date.startsWith(
+                    selectedMonth
+                )
+            ){
+                return false;
+            }
+
+            return true;
+        });
+
+    let total = 0;
+
+    const categoryTotals = {};
+
+    filteredExpenses.forEach(expense => {
+
+        total += expense.amount;
+
+        if(categoryTotals[expense.category]){
+            categoryTotals[expense.category] += expense.amount;
+        }else{
+            categoryTotals[expense.category] = expense.amount;
+        }
+    });
+
+    let highestCategory = "-";
+    let highestAmount = 0;
+
+    for(const category in categoryTotals){
+
+        if(categoryTotals[category] > highestAmount){
+
+            highestAmount =
+                categoryTotals[category];
+
+            highestCategory =
+                category;
+        }
+    }
+
+    const average =
+        filteredExpenses.length > 0
+        ?
+        Math.round(
+            total / filteredExpenses.length
+        )
+        :
+        0;
+
+    // HEADER
+
+    doc.setFontSize(20);
+
+    doc.text(
+        "Expense Report",
+        14,
+        20
+    );
+
+    doc.setFontSize(11);
+
+    doc.text(
+        selectedMonth
+        ?
+        `Month: ${selectedMonth}`
+        :
+        "All Expenses",
+        14,
+        30
+    );
+
+    // SUMMARY SECTION
+
+    doc.setFontSize(14);
+
+    doc.text(
+        "Summary",
+        14,
+        45
+    );
+
+    doc.setFontSize(11);
+
+    doc.text(
+        `Total Bills: ${filteredExpenses.length}`,
+        14,
+        55
+    );
+
+    doc.text(
+        `Total Expenses: Rs. ${total}`,
+        14,
+        63
+    );
+
+    doc.text(
+        `Highest Category: ${highestCategory}`,
+        14,
+        71
+    );
+
+    doc.text(
+        `Average Expense: Rs. ${average}`,
+        14,
+        79
+    );
+
+    // TABLE
+
+    const chartElement =
+    document.querySelector(
+        ".chart-container"
+    );
+
+html2canvas(chartElement)
+.then(canvas => {
+
+    const imgData =
+        canvas.toDataURL("image/png");
+
+    // Chart on top-right of page 1
+    doc.addImage(
+        imgData,
+        "PNG",
+        115,
+        30,
+        80,
+        60
+    );
+
+    const rows = [];
+
+    filteredExpenses.forEach(expense => {
+
+        rows.push([
+            expense.title,
+            `Rs. ${expense.amount}`,
+            expense.category,
+            expense.date
+        ]);
+    });
+
+    doc.autoTable({
+
+        startY: 100,
+
+        head: [[
+            "Title",
+            "Amount",
+            "Category",
+            "Date"
+        ]],
+
+        body: rows
+    });
+
+    doc.setFontSize(10);
+
+    doc.text(
+        `Generated On: ${
+            new Date()
+            .toLocaleString()
+        }`,
+        14,
+        doc.lastAutoTable.finalY + 15
+    );
+
+    doc.save(
+        selectedMonth
+        ?
+        `Expense-Report-${selectedMonth}.pdf`
+        :
+        "Expense-Report.pdf"
+    );
+});
+}
