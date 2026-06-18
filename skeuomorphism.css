@@ -170,6 +170,26 @@ button{
     padding:25px;
 }
 
+@media(max-width:768px){
+
+    .summary-cards{
+
+        display:grid !important;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+
+        gap:12px !important;
+    }
+
+    .summary-card{
+
+        width:auto !important;
+
+        min-width:0 !important;
+    }
+}
+
 .summary-icon{font-size:42px;}
 
 .filter-section,.export-section,.category-section{
@@ -296,7 +316,7 @@ td{
 }
 
 @media(max-width:768px){
-    .header,.summary-card{flex-direction:column;text-align:center;}
+    .header,
     .tabs,.filter-section,.export-section,.category-section{flex-direction:column;}
     .expense-form,.dashboard-section{grid-template-columns:1fr;}
     button{width:100%;}
@@ -548,208 +568,6 @@ input:not(:checked) + .slider .sun-icon{
 
     cursor:pointer;
 }
-
-/* PIE CHART - SKEUOMORPHISM */
-
-.chart-container{
-
-    padding:25px;
-
-    border-radius:20px;
-
-    height:450px;
-
-    background:
-        linear-gradient(
-            to bottom,
-            #fffdf9,
-            #f2e8dc
-        );
-
-    border:1px solid var(--border);
-
-    box-shadow:var(--shadow);
-}
-
-.dark-mode .chart-container{
-
-    background:
-        linear-gradient(
-            to bottom,
-            #352c24,
-            #241d18
-        );
-
-    border:1px solid #524539;
-}
-
-.chart-title{
-
-    text-align:center;
-
-    margin-bottom:20px;
-
-    font-size:20px;
-
-    font-weight:700;
-
-    color:var(--primary-dark);
-}
-
-.dark-mode .chart-title{
-
-    color:#ffb36b;
-}
-
-.chart-layout{
-
-    display:grid;
-
-    grid-template-columns:
-        1fr 220px;
-
-    align-items:center;
-
-    gap:30px;
-
-    height:300px;
-}
-
-.chart-canvas{
-
-    position:relative;
-
-    height:100%;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-}
-
-.chart-legend{
-
-    width:220px;
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:12px;
-}
-
-.legend-item{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:12px;
-
-    padding:10px 12px;
-
-    border-radius:14px;
-
-    background:
-        linear-gradient(
-            to bottom,
-            #fffdf9,
-            #ece0d1
-        );
-
-    border:1px solid var(--border);
-
-    box-shadow:var(--shadow);
-}
-
-.dark-mode .legend-item{
-
-    background:
-        linear-gradient(
-            to bottom,
-            #3b3128,
-            #2a231d
-        );
-
-    border:1px solid #524539;
-}
-
-.legend-item span:last-child{
-
-    line-height:1.4;
-
-    color:var(--primary-dark);
-
-    font-weight:600;
-}
-
-.dark-mode .legend-item span:last-child{
-
-    color:#f2e8dc;
-}
-
-.legend-color{
-
-    width:18px;
-
-    height:18px;
-
-    border-radius:50%;
-
-    flex-shrink:0;
-
-    border:1px solid rgba(0,0,0,.15);
-}
-
-.pie-chart-summary{
-
-    margin-top:15px;
-
-    padding-top:15px;
-
-    text-align:center;
-
-    font-weight:600;
-
-    line-height:1.8;
-
-    color:var(--primary-dark);
-
-    border-top:
-        1px solid rgba(122,96,76,.25);
-}
-
-.dark-mode .pie-chart-summary{
-
-    color:#f2e8dc;
-
-    border-top:
-        1px solid rgba(255,255,255,.08);
-}
-
-#expenseChart{
-
-    max-width:320px !important;
-
-    max-height:320px !important;
-
-    margin:auto;
-}
-
-.chart-container canvas{
-
-    margin:auto !important;
-}
-
-#expenseChart{
-
-    max-width:280px !important;
-
-    max-height:280px !important;
-}
-
-
 
 /* BUDGET PROGRESS */
 
@@ -1230,4 +1048,256 @@ input:not(:checked) + .slider .sun-icon{
     100%{
         transform:translateX(0);
     }
+}
+
+.chart-scroll{
+
+    width:100%;
+
+    overflow-x:auto;
+
+    overflow-y:hidden;
+
+    padding-bottom:10px;
+}
+
+@media(max-width:768px){
+
+    .chart-container{
+
+        min-width:650px;
+    }
+}
+
+/* PIE CHART - SKEUOMORPHISM */
+
+.chart-container{
+
+    padding:25px;
+
+    border-radius:18px;
+
+    height:450px;
+
+    background:#fff8f2;
+
+    border:1px solid #d8c7b7;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.12),
+        inset 0 1px 0 rgba(255,255,255,.8);
+}
+
+@media(max-width:768px){
+
+    .chart-container{
+
+        height:auto;
+
+        min-height:420px;
+    }
+}
+
+.dark-mode .chart-container{
+
+    background:#2b2520;
+
+    border:1px solid #453b33;
+
+    box-shadow:
+        0 2px 10px rgba(0,0,0,.45),
+        inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.chart-title{
+
+    text-align:center;
+
+    margin-bottom:20px;
+
+    font-size:20px;
+
+    font-weight:700;
+
+    color:#8b4513;
+}
+
+.dark-mode .chart-title{
+
+    color:#ffb36b;
+}
+
+.chart-layout{
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 220px;
+
+    align-items:center;
+
+    gap:30px;
+
+    height:300px;
+}
+
+@media(max-width:768px){
+
+    .chart-layout{
+
+        display:flex;
+
+        flex-direction:row;
+
+        align-items:center;
+
+        justify-content:space-between;
+
+        gap:10px;
+
+        height:auto;
+    }
+
+    .chart-canvas{
+
+        flex:1;
+    }
+
+    .chart-legend{
+
+        width:120px;
+
+        flex-shrink:0;
+    }
+}
+
+.chart-canvas{
+
+    position:relative;
+
+    height:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+}
+
+.chart-legend{
+
+    width:220px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+}
+
+.legend-item{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:10px 12px;
+
+    border-radius:12px;
+
+    background:#fff8f2;
+
+    border:1px solid #e2d2c2;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.9),
+        0 1px 3px rgba(0,0,0,.05);
+}
+
+.dark-mode .legend-item{
+
+    background:#322b25;
+
+    border:1px solid #4a4038;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.03),
+        0 1px 4px rgba(0,0,0,.25);
+}
+
+.legend-item span:last-child{
+
+    line-height:1.4;
+
+    color:#5a4634;
+
+    font-weight:600;
+}
+
+.dark-mode .legend-item span:last-child{
+
+    color:#f5e6d8;
+}
+
+.legend-color{
+
+    width:18px;
+
+    height:18px;
+
+    border-radius:50%;
+
+    flex-shrink:0;
+}
+
+.pie-chart-summary{
+
+    margin-top:15px;
+
+    padding-top:15px;
+
+    text-align:center;
+
+    font-weight:600;
+
+    line-height:1.8;
+
+    color:#8b4513;
+
+    border-top:
+        1px solid rgba(139,69,19,.15);
+}
+
+.dark-mode .pie-chart-summary{
+
+    color:#ffb36b;
+
+    border-top:
+        1px solid rgba(255,179,107,.15);
+}
+
+#expenseChart{
+
+    max-width:320px !important;
+
+    max-height:320px !important;
+
+    margin:auto;
+}
+
+@media(max-width:768px){
+
+    #expenseChart{
+
+        max-width:220px !important;
+
+        max-height:220px !important;
+    }
+}
+
+.chart-container canvas{
+
+    margin:auto !important;
 }
