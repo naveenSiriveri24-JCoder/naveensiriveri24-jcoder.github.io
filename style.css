@@ -222,6 +222,17 @@ button:hover{
     gap:15px;
 }
 
+@media(max-width:768px){
+
+    #dashboard{
+
+        grid-template-columns:
+            repeat(2,1fr);
+
+        gap:12px;
+    }
+}
+
 .card{
 
     padding:25px;
@@ -272,6 +283,16 @@ button:hover{
         -10px -10px 22px #ffffff;
 }
 
+@media(max-width:768px){
+
+    .chart-container{
+
+        height:auto;
+
+        min-height:420px;
+    }
+}
+
 .dark-mode .chart-container{
 
     background:#242b24;
@@ -311,6 +332,35 @@ button:hover{
     gap:30px;
 
     height:300px;
+}
+@media(max-width:768px){
+
+    .chart-layout{
+
+        display:flex;
+
+        flex-direction:row;
+
+        align-items:center;
+
+        justify-content:space-between;
+
+        gap:10px;
+
+        height:auto;
+    }
+
+    .chart-canvas{
+
+        flex:1;
+    }
+
+    .chart-legend{
+
+        width:120px;
+
+        flex-shrink:0;
+    }
 }
 
 .chart-canvas{
@@ -425,6 +475,16 @@ button:hover{
     margin:auto;
 }
 
+@media(max-width:768px){
+
+    #expenseChart{
+
+        max-width:220px !important;
+
+        max-height:220px !important;
+    }
+}
+
 .chart-container canvas{
 
     margin:auto !important;
@@ -499,7 +559,35 @@ button:hover{
         10px 10px 22px #d7e5d7,
         -10px -10px 22px #ffffff;
 }
+@media(max-width:768px){
 
+    .summary-card{
+
+        padding:15px;
+
+        gap:10px;
+    }
+
+    .summary-content h2{
+
+        font-size:22px;
+    }
+
+    .summary-icon{
+
+        font-size:30px;
+    }
+}
+@media(max-width:768px){
+
+    .expenses-summary{
+
+        grid-template-columns:
+            repeat(2,1fr);
+
+        gap:12px;
+    }
+}
 .summary-icon{
     font-size:42px;
 }
@@ -630,12 +718,19 @@ tr:hover{
 
     align-items:center;
 
-    gap:10px;
+    gap:12px;
+}
+
+.theme-label{
+
+    font-weight:600;
 }
 
 .switch{
 
     position:relative;
+
+    display:inline-block;
 
     width:65px;
 
@@ -643,63 +738,135 @@ tr:hover{
 }
 
 .switch input{
-    display:none;
+
+    opacity:0;
+
+    width:0;
+
+    height:0;
 }
 
 .slider{
 
     position:absolute;
 
-    inset:0;
+    cursor:pointer;
 
-    border-radius:50px;
+    inset:0;
 
     background:#d6e8d6;
 
+    border-radius:50px;
+
     transition:.3s;
+
+    overflow:hidden;
 }
 
-.slider:before{
+/* MOVING KNOB */
+
+.slider::before{
 
     content:"";
 
     position:absolute;
 
     width:26px;
+
     height:26px;
 
-    top:4px;
     left:4px;
+
+    top:4px;
+
+    background:white;
 
     border-radius:50%;
 
-    background:white;
+    transition:.3s ease;
+
+    z-index:3;
+
+    box-shadow:
+        0 2px 6px rgba(0,0,0,.2);
+}
+
+/* MOON */
+
+.moon-icon{
+
+    position:absolute;
+
+    left:8px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    font-size:17px;
+
+    color:#1d0101;
+
+    z-index:1;
 
     transition:.3s;
 }
 
-.slider:after{
+/* SUN */
 
-    content:"🌙";
+.sun-icon{
 
     position:absolute;
 
-    right:10px;
-    top:6px;
+    right:1px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    font-size:17px;
+
+    color:#f59907;
+
+    z-index:1;
+
+    transition:.3s;
 }
 
+/* CHECKED STATE */
+
 input:checked + .slider{
+
     background:#4caf50;
 }
 
-input:checked + .slider:before{
-    transform:translateX(30px);
+input:checked + .slider::before{
+
+    transform:translateX(31px);
 }
 
-input:checked + .slider:after{
-    content:"☀️";
-    left:10px;
-    right:auto;
+/* OPTIONAL ICON EFFECTS */
+
+input:checked + .slider .moon-icon{
+
+    opacity:.4;
+}
+
+input:not(:checked) + .slider .sun-icon{
+
+    opacity:.4;
+}
+
+/* DARK MODE VERSION */
+
+.dark-mode .slider{
+
+    background:#444;
+}
+
+.dark-mode input:checked + .slider{
+
+    background:#66bb6a;
 }
 
 /* DARK MODE */
@@ -730,7 +897,9 @@ input:checked + .slider:after{
 .dark-mode .expense-form h3{
     color: #57ca5d;
 }
-
+.dark-mode .trend-chart-container h3{
+    color: #2e7d32;
+}
 .dark-mode input,
 .dark-mode select{
 
@@ -1249,4 +1418,204 @@ input:checked + .slider:after{
     color:#4caf50;
 
     margin-right:8px;
+}
+
+.chart-scroll{
+
+    overflow-x:auto;
+
+    width:100%;
+}
+
+@media(max-width:768px){
+
+    .chart-container{
+
+        min-width:650px;
+    }
+}
+
+.pagination{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:15px;
+
+    margin-top:20px;
+}
+
+.pagination button{
+
+    min-width:100px;
+}
+
+#pageInfo{
+
+    font-weight:600;
+}
+
+.page-btn{
+
+    width:42px;
+
+    height:42px;
+
+    padding:0;
+
+    border:none;
+
+    border-radius:50%;
+
+    cursor:pointer;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+}
+
+.page-btn i{
+
+    margin:0;
+}
+
+.page-icon{
+
+    cursor:pointer;
+
+    font-size:18px;
+
+    padding:6px;
+
+    transition:.2s;
+}
+
+.page-icon:hover{
+
+    transform:scale(1.1);
+}
+
+.tagLine{
+
+    font-size:32px;
+
+    font-weight:800;
+
+    background:
+        linear-gradient(
+            90deg,
+            #4caf50,
+            #2196f3,
+            #ff9800,
+            #4caf50
+        );
+
+    background-size:
+        300% 100%;
+
+    -webkit-background-clip:text;
+
+    -webkit-text-fill-color:
+        transparent;
+
+    animation:
+        gradientMove 6s linear infinite;
+}
+
+@keyframes gradientMove{
+
+    from{
+        background-position:0% 50%;
+    }
+
+    to{
+        background-position:300% 50%;
+    }
+}
+
+#toast{
+
+    position:fixed;
+
+    top:20px;
+
+    left:50%;
+
+    transform:
+        translateX(-50%)
+        translateY(-20px);
+
+    background:#f38a81;
+
+    color:#fff;
+
+    padding:10px 18px;
+
+    border-radius:5px;
+
+    font-size:14px;
+
+    font-weight:500;
+
+    opacity:0;
+
+    transition:.3s ease;
+
+    z-index:9999;
+
+    pointer-events:none;
+
+    box-shadow:
+        0 4px 12px rgb(244, 118, 118);
+}
+
+#toast.show{
+
+    opacity:1;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+.dark-mode #toast{
+
+    background:#c5493e;
+
+    color:#fff;
+}
+
+.input-error{
+
+    border:2px solid #e53935 !important;
+
+    animation:shake .3s;
+}
+
+@keyframes shake{
+
+    0%{
+        transform:translateX(0);
+    }
+
+    25%{
+        transform:translateX(-4px);
+    }
+
+    50%{
+        transform:translateX(4px);
+    }
+
+    75%{
+        transform:translateX(-4px);
+    }
+
+    100%{
+        transform:translateX(0);
+    }
 }

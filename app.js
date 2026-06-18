@@ -11,6 +11,10 @@ let categories = [
 ];
 let trendChart;
 let chart;
+
+let currentPage = 1;
+const recordsPerPage = 10;
+
 function saveCategories(){
 
     localStorage.setItem(
@@ -20,6 +24,93 @@ function saveCategories(){
 }
 
 async function addExpense() {
+    
+    const titleInput =
+        document.getElementById(
+            "title"
+        );
+
+    const amountInput =
+        document.getElementById(
+            "amount"
+        );
+
+    const categoryInput =
+        document.getElementById(
+            "category"
+        );
+
+    const dateInput =
+        document.getElementById(
+            "date"
+        );
+
+    [
+        titleInput,
+        amountInput,
+        categoryInput,
+        dateInput
+    ].forEach(field => {
+
+        field.classList.remove(
+            "input-error"
+        );
+    });
+
+    let valid = true;
+
+    if(
+        !titleInput.value.trim()
+    ){
+
+        titleInput.classList.add(
+            "input-error"
+        );
+
+        valid = false;
+    }
+
+    if(
+        !amountInput.value
+    ){
+
+        amountInput.classList.add(
+            "input-error"
+        );
+
+        valid = false;
+    }
+
+    if(
+        !categoryInput.value
+    ){
+
+        categoryInput.classList.add(
+            "input-error"
+        );
+
+        valid = false;
+    }
+
+    if(
+        !dateInput.value
+    ){
+
+        dateInput.classList.add(
+            "input-error"
+        );
+
+        valid = false;
+    }
+
+    if(!valid){
+
+        showToast(
+            "⚠️ Please fill all required fields"
+        );
+
+        return;
+    }
 
     const title =
         document.getElementById("title").value;
@@ -42,7 +133,7 @@ async function addExpense() {
         !category ||
         !date
     ) {
-        alert("Please fill all fields");
+        showToast("Please fill all fields");
         return;
     }
 
@@ -123,12 +214,35 @@ function renderExpenses() {
 
     const filteredExpenses = expenses.filter(expense => {
 
+ if(searchText){
+
+    const titleMatch =
+        expense.title
+        .toLowerCase()
+        .includes(searchText);
+
+    const categoryMatch =
+        expense.category
+        .toLowerCase()
+        .includes(searchText);
+
+    const amountMatch =
+        String(expense.amount)
+        .includes(searchText);
+
+    const dateMatch =
+        expense.date
+        .includes(searchText);
+
     if(
-        searchText &&
-        !expense.title.toLowerCase().includes(searchText)
+        !titleMatch &&
+        !categoryMatch &&
+        !amountMatch &&
+        !dateMatch
     ){
         return false;
     }
+}
 
     if(
         selectedMonth &&
@@ -140,7 +254,34 @@ function renderExpenses() {
     return true;
     });
 
-    filteredExpenses.forEach(expense => {
+    const totalPages =
+    Math.ceil(
+        filteredExpenses.length /
+        recordsPerPage
+    );
+
+if(
+    currentPage > totalPages &&
+    totalPages > 0
+){
+    currentPage = totalPages;
+}
+
+const startIndex =
+    (currentPage - 1) *
+    recordsPerPage;
+
+const endIndex =
+    startIndex +
+    recordsPerPage;
+
+const paginatedExpenses =
+    filteredExpenses.slice(
+        startIndex,
+        endIndex
+    );
+
+    paginatedExpenses.forEach(expense => {
 
 
         total += expense.amount;
@@ -189,12 +330,26 @@ function renderExpenses() {
     const totalAmountElement =
     document.getElementById("totalAmount");
 
-    const budget =
-                Number(
-                    localStorage.getItem(
-                        "monthlyBudget"
-                    )
-                ) || 0;
+const budgets =
+    JSON.parse(
+        localStorage.getItem(
+            "monthlyBudgets"
+        )
+    ) || {};
+
+const budget =
+    budgets[selectedMonth] || 0;
+
+    const budgetInput =
+    document.getElementById(
+        "monthlyBudget"
+    );
+
+if(budgetInput){
+
+    budgetInput.value =
+        budget || "";
+}
 
             const remaining =
                 budget - total;
@@ -275,7 +430,22 @@ function renderExpenses() {
         totalAmountElement.innerText = total;
     }
     
-   
+   document.getElementById(
+    "pageInfo"
+).innerText =
+    `Page ${currentPage} of ${Math.max(totalPages,1)}`;
+
+document.getElementById(
+    "prevBtn"
+).disabled =
+    currentPage === 1;
+
+document.getElementById(
+    "nextBtn"
+).disabled =
+    currentPage === totalPages ||
+    totalPages === 0;
+
     renderTrendChart(
     filteredExpenses
             );
@@ -790,7 +960,46 @@ function renderTrendChart(filteredExpenses){
     if(trendChart){
         trendChart.destroy();
     }
+const gradient =
+    ctx.createLinearGradient(
+        0,
+        0,
+        0,
+        400
+    );
 
+gradient.addColorStop(
+    0,
+    "#eda96a"
+);
+
+gradient.addColorStop(
+    .5,
+    "#e68038"
+);
+
+gradient.addColorStop(
+    1,
+    "#f37b11"
+);
+
+const gradient2 =
+    ctx.createLinearGradient(
+        0,
+        0,
+        0,
+        300
+    );
+
+gradient2.addColorStop(
+    0,
+    "#d3a706"
+);
+
+gradient2.addColorStop(
+    1,
+    "#1f8203"
+);
     trendChart =
         new Chart(ctx, {
 
@@ -809,7 +1018,19 @@ function renderTrendChart(filteredExpenses){
 
                         data: values,
 
-                        borderRadius: 8
+                        borderRadius: 8,
+
+                        borderColor:gradient,
+
+                        backgroundColor:gradient,
+
+                        borderWidth:4,
+
+                        tension:.4,
+
+                        fill:false,
+
+                        order : 2
                     },
 
                     {
@@ -823,7 +1044,13 @@ function renderTrendChart(filteredExpenses){
 
                         fill: false,
 
-                        pointRadius: 5
+                        pointRadius: 5,
+                        
+                        borderColor:gradient2,
+
+                        backgroundColor:gradient2,
+
+                        order : 1
                     }
 
                 ]
@@ -952,12 +1179,12 @@ function addCategory(){
         input.value.trim();
 
     if(!category){
-        alert("Enter category name");
+        showToast("Enter Category name");
         return;
     }
 
     if(categories.includes(category)){
-        alert("Category already exists");
+       showToast("Category already exists");
         return;
     }
 
@@ -981,7 +1208,7 @@ function deleteCategory(){
         );
 
     if(used){
-        alert(
+        showToast(
             "Cannot delete category because expenses use it."
         );
         return;
@@ -1413,7 +1640,12 @@ document.getElementById("monthFilter").value =
     new Date()
         .toISOString()
         .slice(0, 7);
-
+document.getElementById(
+    "monthFilter"
+).addEventListener(
+    "change",
+    renderExpenses
+);
 
 function changeTheme(){
 
@@ -1459,6 +1691,45 @@ window.addEventListener(
         }
     }
 );
+
+const placeholders = [
+
+    " Search by Title...",
+
+    " Search by Category...",
+
+    " Search by Amount...",
+
+    " Search by Date..."
+];
+
+let placeholderIndex = 0;
+
+setInterval(() => {
+
+    const searchInput =
+        document.getElementById(
+            "searchInput"
+        );
+
+    if(
+        searchInput &&
+        document.activeElement !== searchInput
+    ){
+
+        searchInput.placeholder =
+            placeholders[
+                placeholderIndex
+            ];
+
+        placeholderIndex =
+            (
+                placeholderIndex + 1
+            ) %
+            placeholders.length;
+    }
+
+}, 2000);
 
 function renderDashboard(){
 
@@ -1520,10 +1791,115 @@ function saveBudget(){
             ).value
         );
 
+    const selectedMonth =
+        document.getElementById(
+            "monthFilter"
+        ).value;
+
+    const budgets =
+        JSON.parse(
+            localStorage.getItem(
+                "monthlyBudgets"
+            )
+        ) || {};
+
+    budgets[selectedMonth] =
+        budget;
+
     localStorage.setItem(
-        "monthlyBudget",
-        budget
+        "monthlyBudgets",
+        JSON.stringify(budgets)
     );
 
     renderExpenses();
+    const expensesButton =
+    document.querySelector(
+        '[onclick*="expensesTab"]'
+    );
+
+showTab(
+    "expensesTab",
+    expensesButton
+);
 }
+
+function changePage(direction){
+
+    currentPage += direction;
+
+    renderExpenses();
+}
+
+document.getElementById(
+    "searchInput"
+).addEventListener(
+    "input",
+    () => {
+
+        currentPage = 1;
+
+        renderExpenses();
+    }
+);
+
+document.getElementById(
+    "monthFilter"
+).addEventListener(
+    "change",
+    () => {
+
+        currentPage = 1;
+
+        renderExpenses();
+    }
+);
+
+function showToast(message){
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+    toast.innerText =
+        message;
+
+    toast.classList.add(
+        "show"
+    );
+
+    setTimeout(() => {
+
+        toast.classList.remove(
+            "show"
+        );
+
+    }, 3000);
+}
+
+document
+    .querySelectorAll(
+        "#title,#amount,#category,#date"
+    )
+    .forEach(field => {
+
+        field.addEventListener(
+            "input",
+            () => {
+
+                field.classList.remove(
+                    "input-error"
+                );
+            }
+        );
+
+        field.addEventListener(
+            "change",
+            () => {
+
+                field.classList.remove(
+                    "input-error"
+                );
+            }
+        );
+    });

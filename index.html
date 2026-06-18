@@ -17,6 +17,7 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body>
+<div id="toast"></div>
 
 <div class="container">
 
@@ -27,11 +28,14 @@
         <div class="logo">
 
             <i class="fa-solid fa-wallet"></i>
-            Monthly Bill Tracker
+           Monthly Bill Tracker
 
+        <h1 class="tagLine">
             <span>
-                Smart Expense Dashboard
+                Track • Analyze • Save
             </span>
+
+        </h1>
 
         </div>
 
@@ -52,25 +56,30 @@
         </option>
 
     </select>
+<div class="theme-toggle">
 
-    <div class="theme-toggle">
+    <span class="theme-label">
+        Mode
+    </span>
 
-        <span class="theme-label">
-            Mode
+    <label class="switch">
+
+        <input
+            type="checkbox"
+            id="themeSwitch"
+            onchange="toggleTheme()">
+
+        <span class="slider">
+
+            <i class="fa-solid fa-moon moon-icon"></i>
+
+            <i class="fa-solid fa-sun sun-icon"></i>
+
         </span>
 
-        <label class="switch">
+    </label>
 
-            <input
-                type="checkbox"
-                id="themeSwitch"
-                onchange="toggleTheme()">
-
-            <span class="slider"></span>
-
-        </label>
-
-    </div>
+</div>
 
 </div>
 
@@ -162,7 +171,7 @@
         <div class="dashboard-section">
 
             <div id="dashboard"></div>
-
+<div class="chart-scroll">
     <div class="chart-container">
 
         <h3 class="chart-title">
@@ -194,7 +203,7 @@
                     </p>
 
     </div>
-
+</div>
     </div>
 
 </div>
@@ -326,16 +335,19 @@
         <input
             type="text"
             id="searchInput"
-            placeholder="Search Expense..."
             
-            onkeyup="renderExpenses()">
+            oninput="
+                currentPage = 1;
+                renderExpenses();
+            ">
             </div>
         <div class="field-group">
 
             <input
                 type="month"
                 id="monthFilter"
-                onchange="renderExpenses()">
+                onchange="currentPage = 1;
+                            renderExpenses();">
 
         </div>
     </div>
@@ -382,7 +394,23 @@
         </table>
 
     </div>
+       <div class="pagination">
 
+    <i
+        id="prevBtn"
+        class="fa-solid fa-chevron-left page-icon"
+        onclick="changePage(-1)">
+    </i>
+
+    <span id="pageInfo"></span>
+
+    <i
+        id="nextBtn"
+        class="fa-solid fa-chevron-right page-icon"
+        onclick="changePage(1)">
+    </i>
+
+</div>
 </div>
 
     <!-- SETTINGS TAB -->
