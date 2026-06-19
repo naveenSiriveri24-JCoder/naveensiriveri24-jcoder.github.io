@@ -4,8 +4,9 @@ if(
     )
 ){
 
-    window.location.href =
-        "login.html";
+    window.location.replace(
+        "login.html"
+    );
 }
 
 

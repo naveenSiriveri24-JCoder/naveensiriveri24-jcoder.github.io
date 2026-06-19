@@ -4,10 +4,7 @@ const pinBoxes =
     );
 
 pinBoxes.forEach(
-    (
-        box,
-        index
-    ) => {
+    (box, index) => {
 
         box.addEventListener(
             "input",
@@ -27,7 +24,7 @@ pinBoxes.forEach(
     }
 );
 
-function verifyPin(){
+async function verifyPin(){
 
     const pin =
         [...document.querySelectorAll(
@@ -38,17 +35,54 @@ function verifyPin(){
         )
         .join("");
 
-    if(
-        pin === "1234"
-    ){
+    try{
 
-        sessionStorage.setItem(
-            "loggedIn",
-            "true"
+        const response =
+            await fetch(
+                `https://script.google.com/macros/s/AKfycbySuY4-SQmiAIgkOIHSR3cwXifRXvQTfbOpVtYY6JROGtQU64KKruy3wn0er9RjB-beKQ/exec?pin=${pin}`
+            );
+
+        const result =
+            await response.json();
+
+        console.log(result);
+
+        if(result.success){
+
+            sessionStorage.setItem(
+                "loggedIn",
+                "true"
+            );
+                            showToast(
+                    "✅ Login Successful",
+                    "success"
+                );
+
+                setTimeout(() => {
+
+                    window.location.href =
+                        "index.html";
+
+                }, 1000);
+            window.location.href =
+                "index.html";
+        }
+        else{
+
+            showToast(
+                "❌ Invalid PIN",
+                "error"
+            );
+        }
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert(
+            "Unable to verify PIN"
         );
-
-        window.location.href =
-            "index.html";
     }
 }
 
@@ -73,3 +107,28 @@ setInterval(() => {
         texts[index];
 
 }, 1300);
+
+function showToast(
+    message,
+    type = "error"
+){
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+    toast.textContent =
+        message;
+
+    toast.className =
+        `toast show ${type}`;
+
+    setTimeout(() => {
+
+        toast.classList.remove(
+            "show"
+        );
+
+    }, 3000);
+}

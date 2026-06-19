@@ -405,3 +405,61 @@ body{
 
     font-weight:700;
 }
+
+.toast{
+
+    position:fixed;
+
+    top:20px;
+
+    left:50%;
+
+    transform:
+        translateX(-50%)
+        translateY(-20px);
+
+    padding:14px 22px;
+
+    border-radius:12px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    color:white;
+
+    background:#f59313;
+
+    opacity:0;
+
+    visibility:hidden;
+
+    transition:.3s;
+
+    z-index:9999;
+
+    box-shadow:
+        0 8px 20px
+        rgba(0,0,0,.15);
+}
+
+.toast.show{
+
+    opacity:1;
+
+    visibility:visible;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+.toast.success{
+
+    background:#2e7d32;
+}
+
+.toast.error{
+
+    background:#2a2c48;
+}
