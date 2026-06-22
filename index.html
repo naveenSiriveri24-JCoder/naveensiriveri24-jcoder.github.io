@@ -607,11 +607,44 @@
     </div>
 
 </div>
+<div id="deleteModal" class="delete-modal">
 
+    <div class="delete-card">
+
+        <i class="fa-solid fa-trash-can delete-icon"></i>
+
+        <h3>Delete Expense?</h3>
+
+        <p>
+            This action cannot be undone.
+        </p>
+
+        <div class="delete-actions">
+
+            <button
+                class="cancel-btn"
+                onclick="closeDeleteModal()">
+
+                No
+
+            </button>
+
+            <button
+                class="confirm-btn"
+                onclick="confirmDelete()">
+
+                Yes, Delete
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script src="api.js"></script>
-<script src="app.js"></script>
+<script type="module" src="app.js"></script>
 
 </body>
 </html>

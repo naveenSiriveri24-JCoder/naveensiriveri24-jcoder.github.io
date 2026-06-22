@@ -9,10 +9,32 @@ if(
     );
 }
 
+import {
+    saveExpense,
+    loadExpenses,
+    deleteExpenseById,
+     updateExpenseById
+}
+from "./expenseApi.js";
 
+async function init(){
 
+     expenses =
+        await loadExpenses();
+
+    console.log(
+        expenses
+    );
+
+    renderExpenses();
+
+    renderDashboard();
+}
+
+init();
+
+let deleteId = null;
 let expenses = [];
-let editId = null;
 let expenseChart = null;
 let categories = [
     "Electricity",
@@ -24,7 +46,7 @@ let categories = [
 ];
 let trendChart;
 let chart;
-
+let selectedImage = "";
 let currentPage = 1;
 const recordsPerPage = 10;
 
@@ -152,52 +174,49 @@ async function addExpense() {
 
  
 
-    // EDIT MODE
-    if(editId){
 
-        const expense =
-            expenses.find(
-                expense => expense.id === editId
-            );
-
-        expense.title = title;
-        expense.amount = Number(amount);
-        expense.category = category;
-        expense.date = date;
-
-        await updateExpenseInSheet(expense);
-
-        saveExpenses();
-
-        renderExpenses();
-        renderDashboard();
-        clearForm();
-
-        editId = null;
-
-        return;
-    }
 
     // ADD NEW
-    const expense = {
-        id: Date.now(),
-        title,
-        amount: Number(amount),
-        category,
-        date,
-       
-    };
+const expense = {
 
-    await saveExpenseToSheet(expense);
+    title,
 
-    expenses.push(expense);
+    amount:
+        Number(amount),
 
-    saveExpenses();
+    category,
 
-    renderExpenses();
-    renderDashboard();
-    clearForm();
+    date,
+
+    image:
+        selectedImage,
+
+    userName:
+        sessionStorage.getItem(
+            "userName"
+        )
+
+};
+
+await saveExpense(
+    expense
+);
+
+showToast(
+    "✅ Expense Added",
+    "success"
+);
+
+expenses =
+    await loadExpenses();
+
+renderExpenses();
+
+renderDashboard();
+
+clearForm();
 }
+window.addExpense = addExpense;
 
 function renderExpenses() {
 
@@ -320,13 +339,13 @@ const paginatedExpenses =
                 
                 <td>
                     <button
-                        onclick="editExpense(${expense.id})">
+                        onclick="editExpense('${expense.id}')">
                         Edit
                     </button>
 
                     <button
                         class="delete-btn"
-                        onclick="deleteExpense(${expense.id})">
+                        onclick="deleteExpense('${expense.id}')">
                         Delete
                     </button>
                 </td>
@@ -464,27 +483,53 @@ document.getElementById(
 
 async function deleteExpense(id){
 
-    const confirmDelete =
-        confirm(
-            "Are you sure you want to delete this expense?"
-        );
+    deleteId = id;
 
-    if(!confirmDelete){
+    document.getElementById(
+        "deleteModal"
+    ).style.display =
+        "flex";
+}
+function closeDeleteModal(){
+
+    deleteId = null;
+
+    document.getElementById(
+        "deleteModal"
+    ).style.display =
+        "none";
+}
+
+async function confirmDelete(){
+
+    if(!deleteId){
         return;
     }
 
-    await deleteExpenseFromSheet(id);
-
-    expenses =
-        expenses.filter(
-        expense => expense.id !== id
+    await deleteExpenseById(
+        deleteId
     );
 
-    saveExpenses();
+    expenses =
+        await loadExpenses();
 
     renderExpenses();
+
     renderDashboard();
+
+    closeDeleteModal();
+
+    showToast(
+        "🗑 Expense Deleted"
+    );
 }
+
+window.closeDeleteModal =
+    closeDeleteModal;
+
+window.confirmDelete =
+    confirmDelete;
+
 
 function clearForm(){
 
@@ -493,38 +538,17 @@ function clearForm(){
     document.getElementById("category").value = "";
     document.getElementById("date").value = "";
     document.getElementById("billPhoto").value = "";
+
+    selectedImage = "";
+
+    previewImage.src = "";
+
+    previewContainer.style.display =
+        "none";
+
+    fileName.innerText = "";
 }
 
-function saveExpenses() {
-    localStorage.setItem(
-        "expenses",
-        JSON.stringify(expenses)
-    );
-}
-
-const storedExpenses =
-    localStorage.getItem("expenses");
-
-if (storedExpenses) {
-    expenses = JSON.parse(storedExpenses);
-    renderExpenses();
-    renderDashboard();
-}
-
-function getBase64(file) {
-    return new Promise((resolve, reject) => {
-
-        const reader = new FileReader();
-
-        reader.readAsDataURL(file);
-
-        reader.onload = () =>
-            resolve(reader.result);
-
-        reader.onerror = error =>
-            reject(error);
-    });
-}
 
 function viewImage(image){
 
@@ -623,53 +647,57 @@ function closeModal(){
 async function saveEdit(){
 
     const id =
-        Number(
+        document.getElementById(
+            "editId"
+        ).value;
+
+    const updatedExpense = {
+
+        title:
             document.getElementById(
-                "editId"
-            ).value
-        );
+                "editTitle"
+            ).value,
 
-    const expense =
-        expenses.find(
-            e => e.id === id
-        );
+        amount:
+            Number(
+                document.getElementById(
+                    "editAmount"
+                ).value
+            ),
 
-    if(!expense){
-        return;
-    }
-
-    expense.title =
-        document.getElementById(
-            "editTitle"
-        ).value;
-
-    expense.amount =
-        Number(
+        category:
             document.getElementById(
-                "editAmount"
+                "editCategory"
+            ).value,
+
+        date:
+            document.getElementById(
+                "editDate"
             ).value
-        );
 
-    expense.category =
-        document.getElementById(
-            "editCategory"
-        ).value;
+    };
 
-    expense.date =
-        document.getElementById(
-            "editDate"
-        ).value;
+    await updateExpenseById(
 
-    await updateExpenseInSheet(
-        expense
+        id,
+
+        updatedExpense
+
     );
 
-    saveExpenses();
+    expenses =
+        await loadExpenses();
 
     renderExpenses();
+
     renderDashboard();
 
     closeModal();
+
+    showToast(
+        "✅ Expense Updated",
+        "success"
+    );
 }
 
 function renderChart(categoryTotals){
@@ -1246,7 +1274,7 @@ if(storedCategories){
 
 renderCategories();
 
-loadExpensesFromSheet();
+// loadExpensesFromSheet();
 
 
 
@@ -2029,8 +2057,11 @@ function showPreview(file){
     reader.onload =
         function(e){
 
-            previewImage.src =
+            selectedImage =
                 e.target.result;
+
+            previewImage.src =
+                selectedImage;
 
             previewContainer.style.display =
                 "block";
@@ -2049,6 +2080,8 @@ removeImage.addEventListener(
 
         billPhoto.value = "";
 
+        selectedImage = "";
+
         previewImage.src = "";
 
         previewContainer.style.display =
@@ -2058,3 +2091,19 @@ removeImage.addEventListener(
     }
 );
 
+window.showTab = showTab;
+window.addExpense = addExpense;
+window.exportCSV = exportCSV;
+window.exportPDF = exportPDF;
+window.changePage = changePage;
+window.addCategory = addCategory;
+window.deleteCategory = deleteCategory;
+window.saveBudget = saveBudget;
+window.saveEdit = saveEdit;
+window.closeModal = closeModal;
+window.toggleTheme = toggleTheme;
+window.changeTheme = changeTheme;
+window.renderExpenses = renderExpenses;
+window.deleteExpense = deleteExpense;
+window.editExpense = editExpense;
+window.viewImage = viewImage;

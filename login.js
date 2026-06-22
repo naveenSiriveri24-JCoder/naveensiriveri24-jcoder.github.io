@@ -1,3 +1,12 @@
+import { db }
+from "./firebase.js";
+
+import {
+    collection,
+    getDocs
+}
+from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
 const pinBoxes =
     document.querySelectorAll(
         ".pin-box"
@@ -37,35 +46,57 @@ async function verifyPin(){
 
     try{
 
-        const response =
-            await fetch(
-                `https://script.google.com/macros/s/AKfycbySuY4-SQmiAIgkOIHSR3cwXifRXvQTfbOpVtYY6JROGtQU64KKruy3wn0er9RjB-beKQ/exec?pin=${pin}`
+        const snapshot =
+            await getDocs(
+                collection(
+                    db,
+                    "users"
+                )
             );
 
-        const result =
-            await response.json();
+        let valid = false;
+        let userName = "";
 
-        console.log(result);
+        snapshot.forEach(doc => {
 
-        if(result.success){
+            const user =
+                doc.data();
+
+            if(
+                user.pin === pin
+            ){
+
+                valid = true;
+
+                userName =
+                    user.name;
+            }
+        });
+
+        if(valid){
 
             sessionStorage.setItem(
                 "loggedIn",
                 "true"
             );
-                            showToast(
-                    "✅ Login Successful",
-                    "success"
-                );
 
-                setTimeout(() => {
+            sessionStorage.setItem(
+                "userName",
+                userName
+            );
 
-                    window.location.href =
-                        "index.html";
+            showToast(
+                `✅ Welcome ${userName}`,
+                "success"
+            );
 
-                }, 1000);
-            window.location.href =
-                "index.html";
+            setTimeout(() => {
+
+                window.location.href =
+                    "index.html";
+
+            }, 1000);
+
         }
         else{
 
@@ -78,13 +109,25 @@ async function verifyPin(){
     }
     catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
 
-        alert(
-            "Unable to verify PIN"
+        showToast(
+            "❌ Unable to verify PIN",
+            "error"
         );
     }
 }
+
+document
+    .getElementById(
+        "verifyBtn"
+    )
+    .addEventListener(
+        "click",
+        verifyPin
+    );
 
 const texts = [
     "Track Expenses.",
