@@ -1,6 +1,6 @@
 {
-  "name": "Monthly Bill Tracker",
-  "short_name": "Bill Tracker",
+  "name": "Expense Flow",
+  "short_name": "Expense Flow",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
