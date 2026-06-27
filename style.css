@@ -746,7 +746,9 @@ tr:hover{
 
     align-items:center;
 
-    gap:12px;
+    gap:10px;
+
+    margin-right: 0ch;
 }
 
 .theme-label{
@@ -1126,12 +1128,16 @@ input:not(:checked) + .slider .sun-icon{
 
     align-items:center;
 
-    gap:20px;
+    justify-content:flex-end;
+
+    gap:15px;
+
+    width:100%;
 }
 
 #themeSelector{
 
-    padding:10px 15px;
+    padding:10px 8px;
 
     border-radius:12px;
 
@@ -1141,7 +1147,7 @@ input:not(:checked) + .slider .sun-icon{
 
     font-weight:600;
 
-    min-width:180px;
+    padding-left: 0ch;
 }
 .dark-mode #themeSelector{
 
@@ -2536,4 +2542,124 @@ margin-bottom: 0%;
 .darkmode .profile-modal{
 
     color: red;
+}
+
+.info-btn{
+
+    width:35px;
+
+    height:35px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    border:none;
+    background: none;
+    border-radius:50%;
+
+    color:#6cb870;
+
+    cursor:pointer;
+
+    font-size:30px;
+
+    padding:0;
+
+    transition:.3s;
+
+}
+
+
+.info-btn:hover{
+
+    transform:scale(1.08);
+
+    color:#c6f8b9;
+
+}
+
+
+.about-modal{
+
+    position:fixed;
+
+    inset:0;
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:rgba(0,0,0,.45);
+
+    z-index:9999;
+
+}
+
+.about-modal.show{
+
+    display:flex;
+
+}
+
+.about-card{
+
+    width:340px;
+
+    padding:25px;
+
+    border-radius:20px;
+
+    background:white;
+
+    text-align:center;
+
+    position:relative;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.25);
+
+}
+
+.about-icon{
+
+    font-size:60px;
+
+    color:#2E7D32;
+
+    margin-bottom:10px;
+
+}
+
+.version{
+
+    color:#777;
+
+}
+
+.about-details{
+
+    text-align:left;
+
+    line-height:1.7;
+
+    margin-top:15px;
+
+}
+
+.close-about{
+
+    position:absolute;
+
+    top:10px;
+
+    right:15px;
+
+    font-size:28px;
+
+    cursor:pointer;
+
 }
