@@ -1,0 +1,436 @@
+body{
+
+    margin:0;
+
+    font-family:Poppins,sans-serif;
+
+    background:#f7f4ef;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    min-height:100vh;
+
+}
+
+.import-container{
+
+    width:100%;
+
+    max-width:700px;
+
+    padding:20px;
+
+}
+
+.import-card{
+
+    background:white;
+
+    border-radius:28px;
+
+    padding:35px;
+
+    text-align:center;
+
+    box-shadow:
+
+        15px 15px 35px #d8d2cb,
+
+        -10px -10px 25px #ffffff;
+
+}
+
+.import-card h2{
+
+    margin-top:0;
+
+    color:#8B4513;
+
+}
+
+.import-card h2 i{
+
+    color:#ff8c3a;
+
+    margin-right:10px;
+
+}
+
+/* Upload */
+
+.upload-box{
+
+    margin-top:25px;
+
+}
+
+#jsonFile{
+
+    display:none;
+
+}
+
+.upload-label{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    padding:45px;
+
+    border-radius:25px;
+
+    border:3px dashed #ffb48b;
+
+    background:
+
+        linear-gradient(
+
+            180deg,
+
+            #fff8f2,
+
+            #fffdfb
+
+        );
+
+    transition:.3s;
+
+}
+
+.upload-label:hover{
+
+    border-color:#ff8c3a;
+
+    transform:translateY(-3px);
+
+}
+
+.upload-label i{
+
+    font-size:70px;
+
+    color:#ff8c3a;
+
+}
+
+.upload-label h3{
+
+    margin-top:18px;
+
+    color:#8B4513;
+
+    font-size:32px;
+
+}
+
+.upload-label p{
+
+    font-size:24px;
+
+    color:#8B4513;
+
+}
+
+.browse-btn{
+
+    margin-top:15px;
+
+    padding:18px 60px;
+
+    border-radius:12px;
+
+    background:#ffab82;
+
+    color:white;
+
+    font-size:22px;
+
+    font-weight:600;
+
+}
+
+.browse-btn:hover{
+
+    background:#ff8c3a;
+
+}
+
+#fileName{
+
+    margin-top:20px;
+
+    color:#666;
+
+    font-size:15px;
+
+}
+
+/* PIN */
+
+.pin-box{
+
+    margin-top:25px;
+
+}
+
+#pin{
+
+    width:280px;
+
+    height:50px;
+
+    border:none;
+
+    outline:none;
+
+    border-radius:15px;
+
+    text-align:center;
+
+    font-size:18px;
+
+    box-shadow:
+
+        inset 3px 3px 8px #d5d5d5,
+
+        inset -3px -3px 8px white;
+
+}
+
+/* Button */
+
+.import-btn{
+
+    margin-top:25px;
+
+    width:280px;
+
+    height:52px;
+
+    border:none;
+
+    border-radius:16px;
+
+    background:
+
+        linear-gradient(
+
+            135deg,
+
+            #ff8c3a,
+
+            #ff6f3c
+
+        );
+
+    color:white;
+
+    font-size:18px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.import-btn:hover{
+
+    transform:translateY(-3px);
+
+}
+
+.file-info{
+
+    margin-top:18px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+
+}
+
+#fileName{
+
+    color:#2E7D32;
+
+    font-weight:600;
+
+}
+
+#fileSize{
+
+    color:#777;
+
+}
+
+.remove-file-btn{
+
+    margin-top:15px;
+
+    background:#ef5350;
+
+    color:white;
+
+    border:none;
+
+    padding:10px 18px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.remove-file-btn:hover{
+
+    background:#d32f2f;
+
+}
+
+.upload-box.dragover{
+
+    border-color:#4CAF50;
+
+    background:#F2FFF2;
+
+    transform:scale(1.01);
+
+}
+
+.selected-file{
+
+    margin-top:22px;
+
+    position:relative;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    padding:16px 20px;
+
+    border-radius:18px;
+
+    background:linear-gradient(
+        135deg,
+        #f7fafc,
+        #eef5ff
+    );
+
+    border:2px solid #dce9ff;
+
+    box-shadow:
+        0 8px 18px rgba(0,0,0,.08);
+
+}
+
+.file-icon{
+
+    font-size:34px;
+
+    color:#2196F3;
+
+}
+
+.file-details{
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+#fileName{
+
+    font-weight:700;
+
+    color:#333;
+
+}
+
+#fileSize{
+
+    color:#777;
+
+    margin-top:4px;
+
+}
+
+/* Close Button */
+.remove-file-btn{
+
+    position:absolute;
+
+    top:-19px;
+
+    right:-5px;
+
+    width:30px;
+
+    height:30px;
+
+    border:none;
+
+    border-radius:50%;
+
+    color:#f65105;
+
+    display:flex;
+
+    background: none;
+    justify-content:center;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+
+}
+
+.remove-file-btn:hover{
+
+    transform:scale(1.12);
+
+    background:none;
+
+}
+
+
+
+.remove-file-btn i{
+
+    font-size:15px;
+
+}
+
+button:disabled {
+    background: #2e333c;      /* Change to a muted dark color */
+    color: #666666;           /* Gray out the text */
+    cursor: not-allowed;      /* Change mouse cursor to a "no entry" sign */
+    box-shadow: none;         /* Remove your glowing highlights/shadows */
+    transform: none !important; /* Prevent hover lift animations */
+    opacity: 0.5;             /* Make it look faded */
+}

@@ -2054,7 +2054,7 @@ margin-bottom: 0%;
 }
 
 .budget-settings-card{
-    margin-bottom: 100px;
+    margin-bottom: 10px;
 }
 
 .network-banner{
@@ -2961,4 +2961,16 @@ body.dark .about-footer{
 
     text-decoration:underline;
 
+}
+
+.import-card-btn{
+    margin-top:15px;
+    width: 50%;
+    
+}
+
+.import-card-btn button{
+    width:100%;
+    padding:12px 20px;
+    
 }

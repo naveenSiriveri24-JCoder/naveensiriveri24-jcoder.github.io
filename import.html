@@ -2,29 +2,102 @@
 <html>
 <head>
     <title>Import Expenses</title>
+    <link rel="stylesheet" href="import.css">
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body>
 
-<h2>Import Test Expenses</h2>
+<div class="import-container">
 
-<input
-    type="password"
-    id="pin"
-    maxlength="4"
-    placeholder="Enter 4 Digit PIN">
+    <div class="import-card">
 
-<br><br>
+        <h2>
+            <i class="fa-solid fa-file-code"></i>
+            Import Expense Backup
+        </h2>
+<div class="upload-box" id="uploadBox">
 
-<input
-    type="file"
-    id="jsonFile"
-    accept=".json">
+    <input
+        type="file"
+        id="jsonFile"
+        accept=".json">
 
-<br><br>
+    <label
+        for="jsonFile"
+        class="upload-label">
 
-<button onclick="importData()">
-    Import Expenses
-</button>
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+
+        <h3>Drag & Drop JSON File</h3>
+
+        <p>OR</p>
+
+        <span class="browse-btn">
+
+            Browse File
+
+        </span>
+
+    </label>
+
+</div>
+
+<!-- Selected file goes HERE -->
+
+<div
+    class="selected-file"
+    id="selectedFile"
+    style="display:none;">
+
+    <i class="fa-solid fa-file-code file-icon"></i>
+
+    <div class="file-details">
+
+        <span id="fileName"></span>
+
+        <small id="fileSize"></small>
+
+    </div>
+
+    <button
+        type="button"
+        id="removeFileBtn"
+        class="remove-file-btn">
+
+        <i class="fa-solid fa-xmark"></i>
+
+    </button>
+
+</div>
+
+        <div class="pin-box">
+
+            <input
+                type="password"
+                id="pin"
+                maxlength="4"
+                placeholder="Enter 4 Digit Security PIN">
+
+        </div>
+
+        <button
+            class="import-btn"
+            onclick="importData()"
+            type="button" disabled="true"
+            >
+
+            <i class="fa-solid fa-file-import"></i>
+
+            Import Expenses
+        
+
+        </button>
+
+    </div>
+
+</div>
 
 <script type="module" src="import.js"></script>
 

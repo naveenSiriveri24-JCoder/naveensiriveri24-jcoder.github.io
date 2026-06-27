@@ -8,7 +8,7 @@
     <link
     id="themeStylesheet"
     rel="stylesheet"
-    href="skeuomorphism.css?v=3.1.0">
+    href="skeuomorphism.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -103,6 +103,7 @@
                 <option value="style.css">
                     🟢 Claymorphism
                 </option>
+
 
             </select>
 
@@ -598,11 +599,18 @@
             </div>
 
         </div>
-            
-
+                <div class="import-card-btn">
+                    <button onclick="window.location.href='import.html'" >
+                        <i class="fa-solid fa-file-arrow-down"></i> 
+                        Import Bills from JSON
+                    </button>
+                </div>
     </div>
-
+ 
 </div>
+
+
+
 <div id="editModal" class="modal">
 
     <div class="modal-content">
