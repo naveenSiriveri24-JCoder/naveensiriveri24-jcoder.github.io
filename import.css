@@ -434,3 +434,57 @@ button:disabled {
     transform: none !important; /* Prevent hover lift animations */
     opacity: 0.5;             /* Make it look faded */
 }
+
+.import-progress{
+
+    margin-top:20px;
+
+}
+
+.progress-bar{
+
+    width:100%;
+
+    height:8px;
+
+    border-radius:20px;
+
+    background:#E5E5E5;
+
+    overflow:hidden;
+
+}
+
+.progress-fill{
+
+    width:0%;
+
+    height:100%;
+
+    background:linear-gradient(
+
+        90deg,
+
+        #ff8c3a,
+
+        #ff5e3a
+
+    );
+
+    transition:.2s;
+
+}
+
+#progressText{
+
+    display:block;
+
+    margin-top:10px;
+
+    text-align:center;
+
+    font-size:14px;
+
+    color:#666;
+
+}

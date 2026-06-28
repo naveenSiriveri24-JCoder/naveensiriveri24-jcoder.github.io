@@ -2963,14 +2963,13 @@ body.dark .about-footer{
 
 }
 
-.import-card-btn{
-    margin-top:15px;
-    width: 50%;
-    
+.import-export-section{
+
+    display: flex;
+    gap: 20px;
+    width: 100%;
+
 }
 
-.import-card-btn button{
-    width:100%;
-    padding:12px 20px;
-    
-}
+
+

@@ -461,7 +461,7 @@ body{
 
 .toast.error{
 
-    background:#2a2c48;
+    background:#fc3e3e;
 }
 
 .network-banner{
@@ -606,4 +606,9 @@ body{
     letter-spacing:1px;
 
     font-style: italic;
+}
+
+.pin-container input{
+    font-size: 30px;
+    color: #000334;
 }

@@ -1,77 +1,629 @@
-import { db }
-from "./firebase.js";
+/* ------------------------------
+   Global Variables
+------------------------------ */
 
-import {
+const uploadBox =
+    document.getElementById("uploadBox");
 
-    collection,
+const jsonFile =
+    document.getElementById("jsonFile");
 
-    addDoc
+const fileName =
+    document.getElementById("fileName");
+
+const fileSize =
+    document.getElementById("fileSize");
+
+const removeBtn =
+    document.getElementById("removeFileBtn");
+
+const importBtn =
+    document.querySelector(".import-btn");
+
+const pinInput =
+    document.getElementById("pin");
+
+const selectedFile =
+    document.getElementById("selectedFile");
+
+let backupData = null;
+
+let currentUser = null;
+
+let importing = false;
+
+const progress =
+    document.getElementById("importProgress");
+
+progress.style.display = "block";
+
+document.getElementById("progressFill").style.width = "0%";
+
+document.getElementById("progressText").textContent =
+    "Preparing import...";
+
+/* Disable Import initially */
+
+importBtn.disabled = true;
+
+onAuthStateChanged(
+
+    auth,
+
+    async user => {
+
+        if (!user) {
+
+            window.location.replace(
+                "index.html"
+            );
+
+            return;
+
+        }
+
+        currentUser = user;
+
+        await init();
+
+    }
+
+);
+
+async function init() {
+
+    validateImportButton();
 
 }
-from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
-import { auth }
-from "./firebase.js";
 
-import {
-    signInWithEmailAndPassword,
-    setPersistence,
-    browserSessionPersistence
-}
-from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+function validateImportButton() {
 
-import {
-    doc,
-    getDoc
-}
-from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+    const hasFile =
+        backupData !== null;
 
-
-
-console.log(auth.currentUser);
-async function importData(){
-
-    const pin =
-
-        document
-        .getElementById(
-            "pin"
-        )
-        .value
-        .trim();
-
-    if(pin.length !== 4){
-
-        alert(
-            "Enter 4 Digit PIN"
+    const validPin =
+        /^\d{4}$/.test(
+            pinInput.value.trim()
         );
 
+    importBtn.disabled =
+        !(hasFile && validPin);
+
+}
+
+pinInput.addEventListener(
+
+    "input",
+
+    validateImportButton
+
+);
+
+removeBtn.addEventListener(
+
+    "click",
+
+    () => {
+
+        jsonFile.value = "";
+
+        backupData = null;
+
+        fileName.textContent =
+            "No file selected";
+
+        fileSize.textContent =
+            "";
+
+        selectedFile.style.display =
+            "none";
+
+        validateImportButton();
+
+        showToast(
+
+            "File removed.",
+
+            "info"
+
+        );
+
+    }
+
+);
+
+function showToast(
+
+    message,
+
+    type = "info"
+
+) {
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+    toast.className =
+        "toast";
+
+    toast.classList.add(
+        type
+    );
+
+    let icon = "";
+
+    switch (type) {
+
+        case "success":
+
+            icon =
+                '<i class="fa-solid fa-circle-check"></i>';
+
+            break;
+
+        case "error":
+
+            icon =
+                '<i class="fa-solid fa-circle-xmark"></i>';
+
+            break;
+
+        case "warning":
+
+            icon =
+                '<i class="fa-solid fa-triangle-exclamation"></i>';
+
+            break;
+
+        default:
+
+            icon =
+                '<i class="fa-solid fa-circle-info"></i>';
+
+    }
+
+    toast.innerHTML =
+        `${icon}<span>${message}</span>`;
+
+    toast.classList.add(
+        "show"
+    );
+
+    setTimeout(() => {
+
+        toast.classList.remove(
+            "show"
+        );
+
+    }, 3000);
+
+}
+
+async function updateFile(file){
+
+    backupData = null;
+
+    if(!file){
+
+        fileName.textContent =
+            "No file selected";
+
+        fileSize.textContent = "";
+
+        selectedFile.style.display =
+            "none";
+
+        validateImportButton();
+
         return;
+
+    }
+
+    /* File Extension */
+
+    if(!file.name.toLowerCase().endsWith(".json")){
+
+        showToast(
+
+            "Only JSON backup files are allowed.",
+
+            "error"
+
+        );
+
+        jsonFile.value="";
+
+        return;
+
+    }
+
+    /* Max Size : 10 MB */
+
+    if(file.size > 10 * 1024 * 1024){
+
+        showToast(
+
+            "Backup file exceeds 10 MB.",
+
+            "error"
+
+        );
+
+        jsonFile.value="";
+
+        return;
+
     }
 
     try{
 
-        const pinSnapshot =
+        const text =
+            await file.text();
+
+        const backup =
+            JSON.parse(text);
+
+        /* -------- App -------- */
+
+        if(backup.app !== "ExpenseFlow"){
+
+            throw new Error(
+                "This is not an ExpenseFlow backup."
+            );
+
+        }
+
+        /* -------- Version -------- */
+
+        if(backup.version !== "1.0.0"){
+
+            throw new Error(
+                "Unsupported backup version."
+            );
+
+        }
+
+        /* -------- Expenses -------- */
+
+        if(!Array.isArray(backup.expenses)){
+
+            throw new Error(
+                "Expenses section missing."
+            );
+
+        }
+
+        /* -------- Count -------- */
+
+        if(
+
+            backup.totalRecords !==
+
+            backup.expenses.length
+
+        ){
+
+            throw new Error(
+                "Backup appears corrupted."
+            );
+
+        }
+
+        /* -------- Current User -------- */
+
+        const userDoc =
+            await getDoc(
+
+                doc(
+
+                    db,
+
+                    "users",
+
+                    currentUser.uid
+
+                )
+
+            );
+
+        if(!userDoc.exists()){
+
+            throw new Error(
+                "Unable to verify current user."
+            );
+
+        }
+
+        const current =
+            userDoc.data();
+
+        /* -------- UID -------- */
+
+        if(
+
+            backup.uid &&
+
+            backup.uid !== currentUser.uid
+
+        ){
+
+            throw new Error(
+                "Backup belongs to another account."
+            );
+
+        }
+
+        /* -------- Email -------- */
+
+        if(
+
+            backup.userEmail.toLowerCase()
+
+            !==
+
+            current.email.toLowerCase()
+
+        ){
+
+            throw new Error(
+
+                "Backup email doesn't match."
+
+            );
+
+        }
+
+        /* -------- Username -------- */
+
+        if(
+
+            backup.userName.trim()
+
+            !==
+
+            current.name.trim()
+
+        ){
+
+            throw new Error(
+
+                "Backup username doesn't match."
+
+            );
+
+        }
+
+        backupData = backup;
+
+        fileName.textContent =
+            file.name;
+
+        fileSize.textContent =
+            `${(
+
+                file.size / 1024
+
+            ).toFixed(2)} KB`;
+
+        selectedFile.style.display =
+            "flex";
+
+        validateImportButton();
+
+        showToast(
+
+            "Backup verified successfully.",
+
+            "success"
+
+        );
+
+    }
+
+    catch(error){
+
+        backupData = null;
+
+        jsonFile.value="";
+
+        selectedFile.style.display =
+            "none";
+
+        validateImportButton();
+
+        showToast(
+
+            error.message,
+
+            "error"
+
+        );
+
+    }
+
+}
+
+jsonFile.addEventListener("change",()=>{
+
+    updateFile(jsonFile.files[0]);
+
+});
+
+jsonFile.addEventListener(
+
+    "change",
+
+    async()=>{
+
+        if(jsonFile.files.length){
+
+            await updateFile(
+
+                jsonFile.files[0]
+
+            );
+
+        }
+
+    }
+
+);
+
+uploadBox.addEventListener(
+
+    "drop",
+
+    async(e)=>{
+
+        e.preventDefault();
+
+        uploadBox.classList.remove(
+
+            "dragover"
+
+        );
+
+        if(
+
+            !e.dataTransfer.files.length
+
+        ) return;
+
+        const file =
+
+            e.dataTransfer.files[0];
+
+        jsonFile.files =
+
+            e.dataTransfer.files;
+
+        await updateFile(file);
+
+    }
+
+);
+
+async function importData(){
+
+    if(importing) return;
+
+    importing = true;
+
+    importBtn.disabled = true;
+     const progress =
+        document.getElementById("importProgress");
+
+    progress.style.display = "block";
+
+    document.getElementById("progressFill").style.width = "0%";
+
+    document.getElementById("progressText").textContent =
+        "Preparing import...";
+    try{
+
+        /* -------------------------
+           Validate Backup
+        ------------------------- */
+
+        if(!backupData){
+
+            showToast(
+
+                "Select a valid backup file.",
+
+                "error"
+
+            );
+
+            importing = false;
+
+            validateImportButton();
+
+            return;
+
+        }
+
+        /* -------------------------
+           Validate PIN
+        ------------------------- */
+
+        const pin =
+
+            pinInput.value.trim();
+
+        if(!/^\d{4}$/.test(pin)){
+
+            showToast(
+
+                "Enter a valid 4-digit PIN.",
+
+                "error"
+
+            );
+
+            importing = false;
+
+            validateImportButton();
+
+            return;
+
+        }
+
+        showToast(
+
+            "Verifying PIN...",
+
+            "info"
+
+        );
+
+        await setPersistence(
+
+            auth,
+
+            browserSessionPersistence
+
+        );
+
+        const pinDoc =
 
             await getDoc(
 
                 doc(
+
                     db,
+
                     "loginPins",
+
                     pin
+
                 )
+
             );
 
-        if(!pinSnapshot.exists()){
+        if(!pinDoc.exists()){
 
-            alert(
-                "Invalid PIN"
+            showToast(
+
+                "Invalid PIN.",
+
+                "error"
+
             );
+
+            importing = false;
+
+            validateImportButton();
 
             return;
+
         }
 
         const email =
-            pinSnapshot.data().email;
+
+            pinDoc.data().email;
 
         await signInWithEmailAndPassword(
 
@@ -83,207 +635,267 @@ async function importData(){
 
         );
 
-        console.log(
+        showToast(
 
-            "Logged in as",
+            "Checking existing expenses...",
 
-            auth.currentUser.uid
+            "info"
+
+        );
+
+        /* -------------------------
+           Existing Expenses
+        ------------------------- */
+
+        const existingSnapshot =
+
+            await getDocs(
+
+                query(
+
+                    collection(
+
+                        db,
+
+                        "expenses"
+
+                    ),
+
+                    where(
+
+                        "userId",
+
+                        "==",
+
+                        currentUser.uid
+
+                    )
+
+                )
+
+            );
+
+const existingKeys = new Set();
+
+existingSnapshot.forEach(doc=>{
+
+    const e = doc.data();
+
+    const key = [
+
+        e.title ?? "",
+
+        e.amount ?? "",
+
+        e.category ?? "",
+
+        e.date ?? "",
+
+        e.paymentMode ?? "",
+
+        e.description ?? ""
+
+    ].join("|");
+
+    existingKeys.add(key);
+
+});
+
+        let imported = 0;
+
+        let skipped = 0;
+
+        let batch =
+
+            writeBatch(db);
+
+        let operationCount = 0;
+
+        /* -------------------------
+           Import Loop
+        ------------------------- */
+
+        for(const expense of backupData.expenses){
+
+const expenseKey = [
+
+    expense.title ?? "",
+
+    expense.amount ?? "",
+
+    expense.category ?? "",
+
+    expense.date ?? "",
+
+    expense.paymentMode ?? "",
+
+    expense.description ?? ""
+
+].join("|");
+
+if(existingKeys.has(expenseKey)){
+
+    skipped++;
+
+    continue;
+
+}
+
+            if(duplicate){
+
+                skipped++;
+
+                continue;
+
+            }
+
+            const ref =
+
+                doc(
+
+                    collection(
+
+                        db,
+
+                        "expenses"
+
+                    )
+
+                );
+
+            batch.set(
+
+                ref,
+
+                {
+
+                    ...expense,
+
+                    userId:
+
+                        currentUser.uid
+
+                }
+
+            );
+
+            imported++;
+
+            operationCount++;
+
+            /* -------------------------
+               Firestore Limit
+            ------------------------- */
+
+            if(operationCount===450){
+
+                await batch.commit();
+
+                batch =
+
+                    writeBatch(db);
+
+                operationCount = 0;
+
+            }
+
+        }
+
+        if(operationCount>0){
+
+            await batch.commit();
+
+        }
+
+        /* -------------------------
+           Success
+        ------------------------- */
+
+        showToast(
+
+            `Imported ${imported}, Skipped ${skipped}`,
+
+            "success"
 
         );
 
-        const file =
+        /* -------------------------
+           Reset UI
+        ------------------------- */
 
-            document
-            .getElementById(
-                "jsonFile"
-            )
-            .files[0];
+        jsonFile.value="";
 
-        if(!file){
+        pinInput.value="";
 
-            alert(
-                "Select JSON File"
-            );
+        backupData=null;
 
-            return;
-        }
+        selectedFile.style.display="none";
 
-        const text =
-            await file.text();
+        fileName.textContent=
 
-        const expenses =
-            JSON.parse(text);
+            "No file selected";
 
-        for(const expense of expenses){
+        fileSize.textContent="";
 
-            expense.userId =
-                auth.currentUser.uid;
-
-            await addDoc(
-
-                collection(
-                    db,
-                    "expenses"
-                ),
-
-                expense
-
-            );
-        }
-
-        alert(
-
-            "✅ Import Successful"
-
-        );
+        validateImportButton();
 
     }
+
     catch(error){
 
         console.error(error);
 
-        alert(error.message);
-    }
-}
+        showToast(
 
-window.importData=importData;
+            error.message,
 
-const uploadBox=document.getElementById("uploadBox");
+            "error"
 
-const jsonFile=document.getElementById("jsonFile");
-
-const fileName=document.getElementById("fileName");
-
-const fileSize=document.getElementById("fileSize");
-
-const removeBtn=document.getElementById("removeFileBtn");
-
-const importBtn=document.querySelector(".import-btn");
-
-/* Disable initially */
-
-importBtn.disabled=true;
-
-function updateFile(file){
-
-    if(!file){
-
-        fileName.textContent="No file selected";
-
-        fileSize.textContent="";
-
-        document.getElementById("selectedFile").style.display="none";
-
-        importBtn.disabled=true;
-
-        return;
+        );
 
     }
 
-    if(file.name.split(".").pop().toLowerCase()!=="json"){
+    finally{
 
-        alert("Only JSON files are allowed.");
+        importing=false;
 
-        jsonFile.value="";
-
-        updateFile(null);
-
-        return;
+        validateImportButton();
+        progress.style.display = "none";
 
     }
-
-    /* Optional: 10 MB limit */
-
-    if(file.size>10*1024*1024){
-
-        alert("Maximum file size is 10 MB.");
-
-        jsonFile.value="";
-
-        updateFile(null);
-
-        return;
-
-    }
-
-    fileName.textContent = file.name;
-
-    fileSize.textContent=
-        (file.size/1024).toFixed(2)+" KB";
-
-    document.getElementById("selectedFile").style.display="flex";
-
-    importBtn.disabled=true;
 
 }
 
-/* Browse */
+function updateProgress(
 
-jsonFile.addEventListener("change",()=>{
+    current,
 
-    updateFile(jsonFile.files[0]);
+    total
 
-});
+){
 
-/* Remove */
+    const percent =
 
-removeBtn.addEventListener("click",()=>{
+        Math.round(
 
-    jsonFile.value="";
+            current / total * 100
 
-    updateFile(null);
+        );
 
-});
+    document.getElementById(
 
-/* Drag Events */
-uploadBox.addEventListener("dragenter",(e)=>{
+        "progressFill"
 
-    e.preventDefault();
+    ).style.width =
 
-    uploadBox.classList.add("dragover");
+        percent + "%";
 
-});
+    document.getElementById(
 
-uploadBox.addEventListener("dragover",(e)=>{
+        "progressText"
 
-    e.preventDefault();
+    ).textContent =
 
-});
+        `Importing ${current} of ${total}`;
 
-uploadBox.addEventListener("dragleave",(e)=>{
-
-    if(!uploadBox.contains(e.relatedTarget)){
-
-        uploadBox.classList.remove("dragover");
-
-    }
-
-});
-
-uploadBox.addEventListener("drop",(e)=>{
-
-    e.preventDefault();
-
-    uploadBox.classList.remove("dragover");
-
-    const files=e.dataTransfer.files;
-
-    if(files.length===0) return;
-
-    const file=files[0];
-
-    const extension=file.name.split(".").pop().toLowerCase();
-
-    if(extension!=="json"){
-
-        alert("Please select a JSON file.");
-
-        return;
-
-    }
-
-    jsonFile.files=files;
-
-    updateFile(file);
-
-});
+}

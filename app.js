@@ -1,6 +1,7 @@
 import { auth, db }
 from "./firebase.js";
 
+
 import {
     doc,
     getDoc
@@ -65,8 +66,7 @@ async function init(){
     await loadUserProfile();
 }
 
-
-
+let currentUserName = "";
 let deleteId = null;
 let expenses = [];
 let expenseChart = null;
@@ -175,7 +175,7 @@ async function addExpense() {
     if(!valid){
 
         showToast(
-            "⚠️ Please fill all required fields"
+            `<i class="fa-solid fa-triangle-exclamation"></i> Please fill all required fields` 
         );
 
         return;
@@ -202,7 +202,7 @@ async function addExpense() {
         !category ||
         !date
     ) {
-        showToast("Please fill all fields");
+        showToast(`<i class="fa-solid fa-triangle-exclamation"></i> Please fill all fields`);
         return;
     }
 
@@ -236,14 +236,14 @@ await saveExpense(
 );
 
 showToast(
-    "✅ Expense Added Successfully",
+    `<i class="fa-solid fa-check"></i> Expense Added Successfully`,
     "success"
 );
 }
  catch(error){
 
     showToast(
-        "❌ Failed to Add Expense",
+        `<i class="fa-solid fa-circle-xmark"></i> Failed to Add Expense`,
         "error"
     );
 }
@@ -561,7 +561,7 @@ async function confirmDelete(){
     closeDeleteModal();
 
     showToast(
-        "🗑 Expense Deleted"
+        `<i class="fa-solid fa-trash"></i> Expense Deleted`
     );
 }
 
@@ -736,7 +736,7 @@ async function saveEdit(){
     closeModal();
 
     showToast(
-        "✅ Expense Updated",
+        `<i class="fa-solid fa-check-double"></i> Expense Updated`,
         "success"
     );
 }
@@ -1219,12 +1219,12 @@ function addCategory(){
         input.value.trim();
 
     if(!category){
-        showToast("Enter Category name");
+        showToast(`<i class="fa-solid fa-triangle-exclamation"></i> Enter Category name`);
         return;
     }
 
     if(categories.includes(category)){
-       showToast("Category already exists");
+       showToast(`<i class="fa-solid fa-triangle-exclamation"></i> Category already exists`);
         return;
     }
 
@@ -1249,7 +1249,7 @@ function deleteCategory(){
 
     if(used){
         showToast(
-            "Cannot delete category because expenses use it."
+            `<i class="fa-solid fa-triangle-exclamation"></i> Cannot delete category because expenses are using it`
         );
         return;
     }
@@ -2458,27 +2458,37 @@ document.getElementById(
     }
 );
 
-function showToast(message){
+function showToast(
+    message,
+    type = "error"
+){
 
     const toast =
-        document.getElementById(
-            "toast"
-        );
+        document.getElementById("toast");
 
-    toast.innerText =
-        message;
+    /* Remove previous types */
 
-    toast.classList.add(
-        "show"
+    toast.classList.remove(
+        "success",
+        "error",
+        "warning",
+        "info"
     );
+
+    /* Add current type */
+
+    toast.classList.add(type);
+
+    toast.innerHTML = message;
+
+    toast.classList.add("show");
 
     setTimeout(() => {
 
-        toast.classList.remove(
-            "show"
-        );
+        toast.classList.remove("show");
 
     }, 3000);
+
 }
 
 document
@@ -2803,6 +2813,8 @@ async function loadUserProfile(){
 
         const user =
             snapshot.data();
+        
+        currentUserName = user.name;
 
         document.getElementById(
             "headerUserName"
@@ -2912,3 +2924,144 @@ window.openAbout =
 
 window.closeAbout =
     closeAbout;
+
+
+/* for JSON backup */
+async function exportBackup(){
+
+    try{
+
+        const user = auth.currentUser;
+
+        if(!user){
+
+            showToast(
+                `<i class="fa-solid fa-circle-xmark"></i> User not logged in.`,
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        /* Current Date & Time */
+
+        const now = new Date();
+        const safeUserName = currentUserName
+                        .trim()
+                        .replace(/\s+/g, "_")
+                        .replace(/[^a-zA-Z0-9_-]/g, "");
+        /* Backup JSON */
+
+        const backup={
+
+            app:"ExpenseFlow",
+
+            version:"1.0.0",
+
+            backupDate:now.toISOString(),
+
+            uid: auth.currentUser.uid,
+
+            userName: currentUserName,
+
+            userEmail:user.email,
+
+            totalRecords:expenses.length,
+
+            expenses:expenses
+
+        };
+
+        /* Filename */
+
+        const filename=
+
+            `ExpenseFlow_Backup_${safeUserName}_${
+                now.getFullYear()
+            }-${
+                String(now.getMonth()+1).padStart(2,"0")
+            }-${
+                String(now.getDate()).padStart(2,"0")
+            }_${
+                String(now.getHours()).padStart(2,"0")
+            }-${
+                String(now.getMinutes()).padStart(2,"0")
+            }-${
+                String(now.getSeconds()).padStart(2,"0")
+            }.json`;
+
+        /* Download */
+
+        const blob=new Blob(
+
+            [
+
+                JSON.stringify(
+
+                    backup,
+
+                    null,
+
+                    2
+
+                )
+
+            ],
+
+            {
+
+                type:"application/json"
+
+            }
+
+        );
+
+        const url=
+
+            URL.createObjectURL(blob);
+
+        const link=
+
+            document.createElement("a");
+
+        link.href=url;
+
+        link.download=filename;
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+
+        showToast(
+
+            `<i class="fa-solid fa-circle-check"></i> Backup exported successfully.`,
+
+            "success"
+
+        );
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+        showToast(
+
+            `<i class="fa-solid fa-circle-xmark"></i> Backup export failed.`,
+
+            "error"
+
+        );
+
+    }
+
+}
+
+window.exportBackup = exportBackup;

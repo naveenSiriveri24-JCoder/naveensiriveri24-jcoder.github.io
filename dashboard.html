@@ -97,11 +97,11 @@
                 onchange="changeTheme()">
 
                 <option value="skeuomorphism.css">
-                    🟠 Skeuomorphism
+                    🟠 Retro
                 </option>
 
                 <option value="style.css">
-                    🟢 Claymorphism
+                    🟢 Fresh
                 </option>
 
 
@@ -598,12 +598,21 @@
 
             </div>
 
-        </div>
-                <div class="import-card-btn">
-                    <button onclick="window.location.href='import.html'" >
-                        <i class="fa-solid fa-file-arrow-down"></i> 
-                        Import Bills from JSON
-                    </button>
+        </div>  
+                <div class="import-export-section">
+                    <div class="import-card-btn">
+                        <button onclick="window.location.href='import.html'" >
+                            <i class="fa-solid fa-file-arrow-down"></i> 
+                            Import Bills from JSON
+                        </button>
+                    </div>
+
+                    <div class="export-card-btn">
+                        <button onclick="exportBackup()" >
+                            <i class="fa-solid fa-file-arrow-down"></i> 
+                            Backup in JSON
+                        </button>
+                    </div>
                 </div>
     </div>
  

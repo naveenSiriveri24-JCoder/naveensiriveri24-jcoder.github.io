@@ -26,7 +26,6 @@ const pinBoxes =
 
 pinBoxes.forEach(
     (box, index) => {
-
         box.addEventListener(
             "input",
             () => {
@@ -63,20 +62,15 @@ pinBoxes.forEach(
 );
 
 async function verifyPin(){
-
-    const pin =
-        [...document.querySelectorAll(
-            ".pin-box"
-        )]
-        .map(
-            box => box.value
-        )
-        .join("");
+const pinBoxes = [...document.querySelectorAll(".pin-box")];
+const pin = pinBoxes
+    .map(box => box.value)
+    .join("");
 
     if(pin.length !== 4){
 
         showToast(
-            "❌ Enter 4 Digit PIN",
+            `<i class="fa-solid fa-circle-xmark"></i> Enter Your Complete PIN`,
             "error"
         );
 
@@ -103,9 +97,20 @@ async function verifyPin(){
                     if(
                         !pinDoc.exists()
                     ){
+                            /* Clear all PIN boxes */
+
+                            pinBoxes.forEach(box => {
+
+                                box.value = "";
+
+                            });
+
+                            /* Focus first box */
+
+                            pinBoxes[0].focus();
 
                         showToast(
-                            "❌ Invalid PIN",
+                            `<i class="fa-solid fa-xmark"></i> Invalied PIN`,
                             "error"
                         );
 
@@ -126,7 +131,8 @@ async function verifyPin(){
                     );
 
         showToast(
-            "✅ Login Successful",
+            `<i class="fa-solid fa-circle-check"></i>
+            Login Successful`,
             "success"
         );
 
@@ -135,7 +141,7 @@ async function verifyPin(){
             window.location.href =
                 "dashboard.html";
 
-        }, 1000);
+        }, 700);
 
     }
     catch(error){
@@ -143,7 +149,7 @@ async function verifyPin(){
         console.error(error);
 
         showToast(
-            "❌ Invalid PIN",
+            `<i class="fa-solid fa-circle-xmark"></i> Invalied PIN`,
             "error"
         );
     }
@@ -186,23 +192,31 @@ function showToast(
 ){
 
     const toast =
-        document.getElementById(
-            "toast"
-        );
+        document.getElementById("toast");
 
-    toast.textContent =
-        message;
+    /* Remove previous types */
 
-    toast.className =
-        `toast show ${type}`;
+    toast.classList.remove(
+        "success",
+        "error",
+        "warning",
+        "info"
+    );
+
+    /* Add current type */
+
+    toast.classList.add(type);
+
+    toast.innerHTML = message;
+
+    toast.classList.add("show");
 
     setTimeout(() => {
 
-        toast.classList.remove(
-            "show"
-        );
+        toast.classList.remove("show");
 
     }, 3000);
+
 }
 
 window.addEventListener(

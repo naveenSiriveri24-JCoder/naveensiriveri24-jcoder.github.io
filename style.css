@@ -1130,7 +1130,7 @@ input:not(:checked) + .slider .sun-icon{
 
     justify-content:flex-end;
 
-    gap:15px;
+    gap:30px;
 
     width:100%;
 }
@@ -2734,7 +2734,6 @@ body.dark .profile-email{
 
     transition:.3s;
 
-
 }
 
 
@@ -3129,3 +3128,11 @@ body.dark .about-footer{
     text-decoration:underline;
 
 }
+
+.import-export-section{
+
+    display: flex;
+    gap: 20px;
+
+}
+
