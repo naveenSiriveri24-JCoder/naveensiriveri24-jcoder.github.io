@@ -4,4 +4,4 @@ on:
   Workflow_dispatch:
 
   schedule:
-    - cron '30 13 * * *'
+    - cron: '30 13 * * *'
