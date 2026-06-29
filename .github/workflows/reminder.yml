@@ -1,7 +1,25 @@
 name: Daily Expense Reminder
 
-on: 
-  Workflow_dispatch:
+on:
+  workflow_dispatch:
 
   schedule:
     - cron: '30 13 * * *'
+
+jobs:
+  send-notification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send OneSignal Notification
+        run: |
+          curl -X POST https://api.onesignal.com/notifications \
+            -H "Authorization: Key ${{ secrets.ONESIGNAL_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "app_id":"${{ secrets.ONESIGNAL_APP_ID }}",
+              "included_segments":["Subscribed Users"],
+              "headings":{"en":"💰 ExpenseFlow Reminder"},
+              "contents":{"en":"Don'\''t forget to add today'\''s expenses before the day ends."},
+              "url":"https://naveensiriveri24-jcoder.github.io/"
+            }'
