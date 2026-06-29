@@ -120,5 +120,14 @@
 </div>
 
 <script type="module" src="login.js?v=3.1.0"></script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "7ae2bac4-7c05-4527-a348-8cd5ba0a00af",
+    });
+  });
+</script>
 </body>
 </html>
