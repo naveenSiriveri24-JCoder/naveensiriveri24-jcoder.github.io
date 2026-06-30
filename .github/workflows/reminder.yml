@@ -1,21 +1,18 @@
-name: Daily Expense Reminder
+name: ExpenseFlow Morning Test
 
 on:
   workflow_dispatch:
 
   schedule:
-    # 11:59 PM IST
-    - cron: '29 18 * * *'
-
-    # 12:02 AM IST
-    - cron: '32 18 * * *'
+    # 8:00 AM IST (2:30 AM UTC)
+    - cron: '30 2 * * *'
 
 jobs:
   send-notification:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Send Expense Reminder
+      - name: Send Morning Test Notification
         run: |
           RESPONSE=$(curl -s -X POST "https://api.onesignal.com/notifications" \
             -H "Content-Type: application/json" \
@@ -25,10 +22,10 @@ jobs:
               "target_channel":"push",
               "included_segments":["Total Subscriptions"],
               "headings":{
-                "en":"🧪 ExpenseFlow Test"
+                "en":"🌅 ExpenseFlow Morning Test"
               },
               "contents":{
-                "en":"This is an automatic GitHub Actions test notification."
+                "en":"Good morning! This is an automatic GitHub Actions test notification."
               },
               "url":"https://naveensiriveri24-jcoder.github.io/"
             }')
