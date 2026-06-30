@@ -11,6 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check App ID
+        run: |
+          echo "App ID length: ${#APP_ID}"
+        env:
+          APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
       - name: Send OneSignal Notification
         run: |
           curl -X POST https://api.onesignal.com/notifications \
