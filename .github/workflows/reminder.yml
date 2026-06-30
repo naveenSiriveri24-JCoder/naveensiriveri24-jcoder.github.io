@@ -3,10 +3,6 @@ name: Daily Expense Reminder
 on:
   workflow_dispatch:
 
-  schedule:
-    # 7:00 PM IST = 1:30 PM UTC
-    - cron: '30 13 * * *'
-
 jobs:
   send-notification:
     runs-on: ubuntu-latest
@@ -14,23 +10,22 @@ jobs:
     steps:
       - name: Send OneSignal Notification
         run: |
-          echo "Sending notification..."
-
           RESPONSE=$(curl -s -X POST "https://api.onesignal.com/notifications" \
             -H "Authorization: Bearer ${{ secrets.ONESIGNAL_API_KEY }}" \
             -H "Content-Type: application/json" \
             -d '{
-              "app_id": "${{ secrets.ONESIGNAL_APP_ID }}",
-              "included_segments": ["Subscribed Users"],
-              "target_channel": "push",
-              "headings": {
-                "en": "💰 ExpenseFlow Reminder"
+              "app_id":"${{ secrets.ONESIGNAL_APP_ID }}",
+              "include_subscription_ids":[
+                "7eae6932-6892-42ce-b0d9-3b4705c47930"
+              ],
+              "target_channel":"push",
+              "headings":{
+                "en":"🧪 API Test"
               },
-              "contents": {
-                "en": "Don'\''t forget to add today'\''s expenses before the day ends."
+              "contents":{
+                "en":"Testing direct Subscription ID notification."
               },
-              "url": "https://naveensiriveri24-jcoder.github.io/"
+              "url":"https://naveensiriveri24-jcoder.github.io/"
             }')
 
-          echo "OneSignal Response:"
           echo "$RESPONSE"
