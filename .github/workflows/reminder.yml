@@ -14,7 +14,7 @@ jobs:
       - name: Send OneSignal Notification
         run: |
           curl -X POST https://api.onesignal.com/notifications \
-            -H "Authorization: Key ${{ secrets.ONESIGNAL_API_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.ONESIGNAL_API_KEY }}" \
             -H "Content-Type: application/json" \
             -d '{
               "app_id":"${{ secrets.ONESIGNAL_APP_ID }}",
