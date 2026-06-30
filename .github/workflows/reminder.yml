@@ -15,9 +15,7 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{
               "app_id":"${{ secrets.ONESIGNAL_APP_ID }}",
-              "include_subscription_ids":[
-                "7eae6932-6892-42ce-b0d9-3b4705c47930"
-              ],
+              "included_segments":["Subscribed Users"],
               "target_channel":"push",
               "headings":{
                 "en":"🧪 API Test"
