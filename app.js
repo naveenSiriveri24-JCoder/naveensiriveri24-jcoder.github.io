@@ -4,7 +4,8 @@ from "./firebase.js";
 
 import {
     doc,
-    getDoc
+    getDoc,
+    updateDoc
 }
 from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
@@ -57,16 +58,24 @@ from "./expenseApi.js";
 
 async function init(){
 
-     expenses =
+    expenses =
         await loadExpenses();
+
+    await loadUserProfile();
+
+    categories =
+        currentUserData.categories || categories;
+
+    await renderCategories();
 
     renderExpenses();
 
     renderDashboard();
-    await loadUserProfile();
+
 }
 
 let currentUserName = "";
+let currentUserData = {};
 let deleteId = null;
 let expenses = [];
 let expenseChart = null;
@@ -84,11 +93,20 @@ let selectedImage = "";
 let currentPage = 1;
 const recordsPerPage = 10;
 
-function saveCategories(){
+async function saveCategories(){
 
-    localStorage.setItem(
-        "categories",
-        JSON.stringify(categories)
+    await updateDoc(
+
+        doc(
+            db,
+            "users",
+            auth.currentUser.uid
+        ),
+
+        {
+            categories: categories
+        }
+
     );
 }
 
@@ -225,6 +243,8 @@ const expense = {
     image:
         selectedImage,
 
+    createdAt: Date.now(), // Used only for sorting
+
     userId:
     auth.currentUser.uid
 
@@ -260,6 +280,18 @@ clearForm();
 window.addExpense = addExpense;
 
 function renderExpenses() {
+
+ /* Show newest expenses first */
+
+    expenses.sort((a, b) => {
+
+        const timeA = a.createdAt || new Date(a.date).getTime();
+
+        const timeB = b.createdAt || new Date(b.date).getTime();
+
+        return timeB - timeA;
+
+    });
 
     const table =
         document.getElementById("expenseTable");
@@ -323,18 +355,22 @@ function renderExpenses() {
     return true;
     });
 
-    const totalPages =
-    Math.ceil(
-        filteredExpenses.length /
-        recordsPerPage
+    const totalPages = Math.max(
+        1,
+        Math.ceil(filteredExpenses.length / recordsPerPage)
     );
 
-if(
-    currentPage > totalPages &&
-    totalPages > 0
-){
-    currentPage = totalPages;
-}
+    if(currentPage < 1){
+
+        currentPage = 1;
+
+    }
+
+    if(currentPage > totalPages){
+
+        currentPage = totalPages;
+
+    }
 
 const startIndex =
     (currentPage - 1) *
@@ -400,11 +436,7 @@ const paginatedExpenses =
     document.getElementById("totalAmount");
 
 const budgets =
-    JSON.parse(
-        localStorage.getItem(
-            "monthlyBudgets"
-        )
-    ) || {};
+    currentUserData.monthlyBudgets || {};
 
 const budget =
     budgets[selectedMonth] || 0;
@@ -499,7 +531,7 @@ if(budgetInput){
         totalAmountElement.innerText = total;
     }
     
-   document.getElementById(
+document.getElementById(
     "pageInfo"
 ).innerText =
     `Page ${currentPage} of ${Math.max(totalPages,1)}`;
@@ -553,6 +585,7 @@ async function confirmDelete(){
 
     expenses =
         await loadExpenses();
+
 
     renderExpenses();
 
@@ -692,6 +725,9 @@ async function saveEdit(){
             "editId"
         ).value;
 
+        const existingExpense = expenses.find(
+            expense => expense.id === id
+        );
     const updatedExpense = {
 
         title:
@@ -714,7 +750,11 @@ async function saveEdit(){
         date:
             document.getElementById(
                 "editDate"
-            ).value
+            ).value,
+        
+        /* Preserve original creation time */
+
+         createdAt: existingExpense.createdAt || Date.now()
 
     };
 
@@ -1175,7 +1215,7 @@ function exportCSV() {
     URL.revokeObjectURL(url);
 }
 
-function renderCategories(){
+async function renderCategories(){
 
     const categorySelect =
         document.getElementById("category");
@@ -1210,7 +1250,7 @@ function renderCategories(){
     }
 }
 
-function addCategory(){
+async function addCategory(){
 
     const input =
         document.getElementById("categoryInput");
@@ -1227,20 +1267,29 @@ function addCategory(){
        showToast(`<i class="fa-solid fa-triangle-exclamation"></i> Category already exists`);
         return;
     }
-
+    try{
     categories.push(category);
+    showToast(
+    `<i class="fa-solid fa-check"></i> Category Added Successfully`,
+    "success"
+    );
+    }catch(error){
 
-    saveCategories();
+    }
+    
+    await saveCategories();
 
-    renderCategories();
+    await renderCategories();
 
     input.value = "";
 }
 
-function deleteCategory(){
+async function deleteCategory(){
 
     const category =
-        document.getElementById("categoryDelete").value;
+        document.getElementById(
+            "categoryDelete"
+        ).value;
 
     const used =
         expenses.some(
@@ -1248,10 +1297,14 @@ function deleteCategory(){
         );
 
     if(used){
+
         showToast(
-            `<i class="fa-solid fa-triangle-exclamation"></i> Cannot delete category because expenses are using it`
+            `<i class="fa-solid fa-triangle-exclamation"></i> Cannot delete category because expenses are using it`,
+            "warning"
         );
+
         return;
+
     }
 
     categories =
@@ -1259,24 +1312,30 @@ function deleteCategory(){
             c => c !== category
         );
 
-    saveCategories();
+    try{
 
-    renderCategories();
-    
+        await saveCategories();
+
+        await renderCategories();
+
+        showToast(
+            `<i class="fa-solid fa-trash-can"></i> Category deleted successfully`,
+            "success"
+        );
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        showToast(
+            `<i class="fa-solid fa-circle-xmark"></i> Failed to delete category`,
+            "error"
+        );
+
+    }
+
 }
-
-const storedCategories =
-    localStorage.getItem("categories");
-
-if(storedCategories){
-    categories = JSON.parse(storedCategories);
-}
-
-renderCategories();
-
-// loadExpensesFromSheet();
-
-
 
 function toggleTheme(){
 
@@ -2386,50 +2445,81 @@ function renderDashboard(){
         categoryTotals
     );
 }
-function saveBudget(){
+async function saveBudget(){
 
-    const budget =
-        Number(
-            document.getElementById(
-                "monthlyBudget"
-            ).value
-        );
+    const budget = Number(
+
+        document.getElementById(
+            "monthlyBudget"
+        ).value
+
+    );
 
     const selectedMonth =
         document.getElementById(
             "monthFilter"
         ).value;
 
-    const budgets =
-        JSON.parse(
-            localStorage.getItem(
-                "monthlyBudgets"
-            )
-        ) || {};
+    if(!currentUserData.monthlyBudgets){
 
-    budgets[selectedMonth] =
-        budget;
+        currentUserData.monthlyBudgets = {};
 
-    localStorage.setItem(
-        "monthlyBudgets",
-        JSON.stringify(budgets)
-    );
+    }
 
-    renderExpenses();
-    const expensesButton =
-    document.querySelector(
-        '[onclick*="expensesTab"]'
-    );
+    currentUserData.monthlyBudgets[selectedMonth] = budget;
 
-showTab(
-    "expensesTab",
-    expensesButton
-);
+    try{
+
+        await updateDoc(
+
+            doc(
+                db,
+                "users",
+                auth.currentUser.uid
+            ),
+
+            {
+                monthlyBudgets:
+                    currentUserData.monthlyBudgets
+            }
+
+        );
+
+        renderExpenses();
+
+        const expensesButton =
+            document.querySelector(
+                '[onclick*="expensesTab"]'
+            );
+
+        showTab(
+            "expensesTab",
+            expensesButton
+        );
+
+        showToast(
+            `<i class="fa-solid fa-circle-check"></i> Budget saved successfully`,
+            "success"
+        );
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        showToast(
+            `<i class="fa-solid fa-circle-xmark"></i> Failed to save budget`,
+            "error"
+        );
+
+    }
+
 }
 
 function changePage(direction){
 
     currentPage += direction;
+
 
     renderExpenses();
 }
@@ -2487,7 +2577,7 @@ function showToast(
 
         toast.classList.remove("show");
 
-    }, 3000);
+    }, 1000);
 
 }
 
@@ -2813,7 +2903,9 @@ async function loadUserProfile(){
 
         const user =
             snapshot.data();
-        
+
+        currentUserData = user;
+        console.log(currentUserData);
         currentUserName = user.name;
 
         document.getElementById(
@@ -3065,3 +3157,4 @@ async function exportBackup(){
 }
 
 window.exportBackup = exportBackup;
+

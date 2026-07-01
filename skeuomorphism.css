@@ -1074,6 +1074,18 @@ input:not(:checked) + .slider .sun-icon{
 
     color:#fff;
 }
+#toast.success{
+    background-color: #018f08;
+}
+
+#toast.error{
+    background-color: #fe4b23;
+}
+
+#toast.warning{
+    background-color: #f9e96c;
+    color: rgb(250, 75, 75);
+}
 
 .input-error{
 
@@ -2970,6 +2982,8 @@ body.dark .about-footer{
     width: 100%;
 
 }
+
+
 
 
 
